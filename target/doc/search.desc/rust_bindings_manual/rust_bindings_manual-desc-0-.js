@@ -1,0 +1,1 @@
+searchState.loadedDescShard("rust_bindings_manual", 0, "Java-Rust Bindings Manual")
