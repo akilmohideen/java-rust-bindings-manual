@@ -1,1 +1,0 @@
-# java-rust-bindings-manual

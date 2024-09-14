@@ -1,1 +1,0 @@
-window.ALL_CRATES = ["rust_bindings_manual"];
