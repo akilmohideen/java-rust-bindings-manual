@@ -1,0 +1,3 @@
+(function() {var implementors = {
+"rust_bindings_manual":[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.81.0/core/marker/trait.Unpin.html\" title=\"trait core::marker::Unpin\">Unpin</a> for <a class=\"struct\" href=\"rust_bindings_manual/struct._Dummy.html\" title=\"struct rust_bindings_manual::_Dummy\">_Dummy</a>",1,["rust_bindings_manual::_Dummy"]]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

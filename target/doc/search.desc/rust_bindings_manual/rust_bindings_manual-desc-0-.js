@@ -1,1 +1,1 @@
-searchState.loadedDescShard("rust_bindings_manual", 0, "Java-Rust Bindings Manual")
+searchState.loadedDescShard("rust_bindings_manual", 0, "Advanced Java Bindings for Complex Rust Libraries\nReturns the argument unchanged.\nCalls <code>U::from(self)</code>.")
