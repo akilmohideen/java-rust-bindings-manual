@@ -1,4 +1,4 @@
-# Loading the Shared Library in Java
+## Loading the Shared Library in Java
 
 In Java, use SymbolLookup and Linker to load the shared library and access the Rust functions.
 

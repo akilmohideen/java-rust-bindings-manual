@@ -1,4 +1,4 @@
-# Rust Functions with Lifetimes
+## Rust Functions with Lifetimes
 
 Lifetimes ensure that references in Rust are valid as long as they are needed. When exposing such functions to Java, care must be taken to ensure that the references remain valid and are not prematurely deallocated by Java’s garbage collector (GC).
 
