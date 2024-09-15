@@ -1,0 +1,18 @@
+## Async Rust Functions in Java
+
+Rust’s `async` functions must be carefully integrated with Java’s concurrency model. Consider using Java’s `CompletableFuture` to represent Rust’s `Future` type.
+```rust
+use std::future::Future;
+
+#[no_mangle]
+extern "C" fn async_add(a: i32, b: i32) -> impl Future<Output = i32> {
+    async move { a + b }
+}
+
+
+In Java, you would create a CompletableFuture to handle the result of the async operation:
+
+CompletableFuture<Integer> result = CompletableFuture.supplyAsync(() -> {
+    return (int) asyncAddHandle.invokeExact(3, 4);
+});
+```

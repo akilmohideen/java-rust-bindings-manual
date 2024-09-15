@@ -1,3 +1,0 @@
-# Introduction
-
-This manual provides detailed instructions for creating Java bindings to Rust libraries...
