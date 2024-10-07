@@ -1,5 +1,5 @@
 # Summary
-
+[Java Bindings for Rust: A Comprehensive Guide](title.md)
 - [Introduction](./cha01-00.md)
     - [Purpose of the Manual](./cha01-01.md)
     - [Why Java 22?](./cha01-02.md)
@@ -20,7 +20,18 @@
 * [Comprehensive Example](./cha06-00)
 
 # Appendix
-
-
+  * [Value Layout](./value_layout.md)
+  * [Shared Object and Dynamic Library Files](./so.md)
+  * [Arenas](./arenas.md)
+  * [Ownership](./ownership.md)
+  * [Borrowing and Aliasing](./borrowing_and_aliasing.md)
+  * [Lifetimes](./lifetimes.md)
+  * [Subtyping and Variance](./subtyping_and_variance.md)
+  * [Unwinding](./unwinding.md)
+  * [Phantom Data](./phantom_data.md)
+  * [Send and Sync](./send_and_sync.md)
+  * [Data Races](./data_races.md)
+  * [Atomics](./atomics.md)
+  * [Compiler and Hardware Reordering](./reordering.md)
 
 
