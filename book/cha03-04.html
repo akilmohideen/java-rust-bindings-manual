@@ -3,8 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Page not found - Java Bindings for Rust: A Comprehensive Guide</title>
-        <base href="/">
+        <title>Handling Thread Safety in Rust - Java Bindings for Rust: A Comprehensive Guide</title>
 
 
         <!-- Custom HTML head -->
@@ -89,7 +88,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="cha01-00.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="cha01-01.html"><strong aria-hidden="true">1.1.</strong> Purpose of the Manual</a></li><li class="chapter-item expanded "><a href="cha01-02.html"><strong aria-hidden="true">1.2.</strong> Why Java 22?</a></li><li class="chapter-item expanded "><a href="cha01-03.html"><strong aria-hidden="true">1.3.</strong> How Java and Rust Work Together</a></li><li class="chapter-item expanded "><a href="cha01-04.html"><strong aria-hidden="true">1.4.</strong> What This Manual Hopes to Accomplish</a></li></ol></li><li class="chapter-item expanded "><a href="cha02-00.html"><strong aria-hidden="true">2.</strong> Setting Up and Linking Rust and Java</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="cha02-01.html"><strong aria-hidden="true">2.1.</strong> How Rust and Java Communicate</a></li><li class="chapter-item expanded "><a href="cha02-02.html"><strong aria-hidden="true">2.2.</strong> Setting Up Rust</a></li><li class="chapter-item expanded "><a href="cha02-03.html"><strong aria-hidden="true">2.3.</strong> Setting Up Java</a></li></ol></li><li class="chapter-item expanded "><a href="cha03-00.html"><strong aria-hidden="true">3.</strong> Mapping Rust Features to Java</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="cha03-01.html"><strong aria-hidden="true">3.1.</strong> Accounting for Rust Lifetimes</a></li><li class="chapter-item expanded "><a href="cha03-02.html"><strong aria-hidden="true">3.2.</strong> Handling Ownership and Borrowing</a></li><li class="chapter-item expanded "><a href="cha03-03.html"><strong aria-hidden="true">3.3.</strong> Memory Layouts and Structs</a></li><li class="chapter-item expanded "><a href="cha03-04.html"><strong aria-hidden="true">3.4.</strong> Handling Thread Safety in Rust</a></li><li class="chapter-item expanded "><a href="cha03-05.html"><strong aria-hidden="true">3.5.</strong> Handling Rust’s Enums and Option Types</a></li></ol></li><li class="chapter-item expanded "><a href="cha04-00.html"><strong aria-hidden="true">4.</strong> Handling Common Data Structures</a></li><li class="chapter-item expanded "><a href="cha05-00.html"><strong aria-hidden="true">5.</strong> Edge Cases and Troubleshooting</a></li><li class="chapter-item expanded "><a href="cha06-00.html"><strong aria-hidden="true">6.</strong> Comprehensive Example</a></li><li class="chapter-item expanded affix "><li class="part-title">Appendix</li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="cha01-00.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="cha01-01.html"><strong aria-hidden="true">1.1.</strong> Purpose of the Manual</a></li><li class="chapter-item expanded "><a href="cha01-02.html"><strong aria-hidden="true">1.2.</strong> Why Java 22?</a></li><li class="chapter-item expanded "><a href="cha01-03.html"><strong aria-hidden="true">1.3.</strong> How Java and Rust Work Together</a></li><li class="chapter-item expanded "><a href="cha01-04.html"><strong aria-hidden="true">1.4.</strong> What This Manual Hopes to Accomplish</a></li></ol></li><li class="chapter-item expanded "><a href="cha02-00.html"><strong aria-hidden="true">2.</strong> Setting Up and Linking Rust and Java</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="cha02-01.html"><strong aria-hidden="true">2.1.</strong> How Rust and Java Communicate</a></li><li class="chapter-item expanded "><a href="cha02-02.html"><strong aria-hidden="true">2.2.</strong> Setting Up Rust</a></li><li class="chapter-item expanded "><a href="cha02-03.html"><strong aria-hidden="true">2.3.</strong> Setting Up Java</a></li></ol></li><li class="chapter-item expanded "><a href="cha03-00.html"><strong aria-hidden="true">3.</strong> Mapping Rust Features to Java</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="cha03-01.html"><strong aria-hidden="true">3.1.</strong> Accounting for Rust Lifetimes</a></li><li class="chapter-item expanded "><a href="cha03-02.html"><strong aria-hidden="true">3.2.</strong> Handling Ownership and Borrowing</a></li><li class="chapter-item expanded "><a href="cha03-03.html"><strong aria-hidden="true">3.3.</strong> Memory Layouts and Structs</a></li><li class="chapter-item expanded "><a href="cha03-04.html" class="active"><strong aria-hidden="true">3.4.</strong> Handling Thread Safety in Rust</a></li><li class="chapter-item expanded "><a href="cha03-05.html"><strong aria-hidden="true">3.5.</strong> Handling Rust’s Enums and Option Types</a></li></ol></li><li class="chapter-item expanded "><a href="cha04-00.html"><strong aria-hidden="true">4.</strong> Handling Common Data Structures</a></li><li class="chapter-item expanded "><a href="cha05-00.html"><strong aria-hidden="true">5.</strong> Edge Cases and Troubleshooting</a></li><li class="chapter-item expanded "><a href="cha06-00.html"><strong aria-hidden="true">6.</strong> Comprehensive Example</a></li><li class="chapter-item expanded affix "><li class="part-title">Appendix</li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle">
                 <div class="sidebar-resize-indicator"></div>
@@ -174,14 +173,56 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="document-not-found-404"><a class="header" href="#document-not-found-404">Document not found (404)</a></h1>
-<p>This URL is invalid, sorry. Please use the navigation bar or search to continue.</p>
+                        <h1 id="handling-thread-safety-in-rust"><a class="header" href="#handling-thread-safety-in-rust">Handling Thread Safety in Rust</a></h1>
+<h2 id="identifying-thread-safety-in-rust"><a class="header" href="#identifying-thread-safety-in-rust">Identifying Thread Safety in Rust</a></h2>
+<p>In Rust, <strong>thread safety</strong> is ensured using the Send and Sync traits. If a Rust function operates across multiple threads, the types used in the function must implement <code>Send</code> or <code>Sync</code>. For example, if a Rust function uses a <strong>Mutex</strong> or <strong>Arc</strong> to manage shared data, it is thread-safe.</p>
+<h3 id="example"><a class="header" href="#example">Example:</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use std::sync::{Arc, Mutex};
+
+pub fn create_shared_data() -&gt; Arc&lt;Mutex&lt;i32&gt;&gt; {
+    Arc::new(Mutex::new(42))
+}
+<span class="boring">}</span></code></pre></pre>
+<p>The function returns a thread-safe <code>Arc&lt;Mutex&lt;i32&gt;&gt;</code>, which ensures that multiple threads can safely access and modify the shared data.</p>
+<h2 id="ensuring-thread-safety-in-java"><a class="header" href="#ensuring-thread-safety-in-java">Ensuring Thread Safety in Java</a></h2>
+<p>When dealing with thread safety across languages, Java must ensure that memory is safely shared between threads. Java’s Foreign Function and Memory API provides <strong>Shared Arenas</strong>, which allow memory to be safely accessed by multiple threads.</p>
+<h3 id="what-you-need-to-do"><a class="header" href="#what-you-need-to-do">What You Need to Do:</a></h3>
+<ul>
+<li>Use <strong>Shared Arenas</strong> when you expect shared memory or thread-safe operations in Rust.</li>
+<li>Java also provides synchronization mechanisms like <strong>synchronized blocks</strong> to ensure thread safety.</li>
+</ul>
+<h3 id="java-example-handling-thread-safety"><a class="header" href="#java-example-handling-thread-safety">Java Example (Handling Thread Safety):</a></h3>
+<pre><code class="language-java">// Create a shared arena for multi-threaded operations
+var sharedArena = Arena.ofShared();
+MemorySegment sharedSegment = sharedArena.allocate(8);  // Allocate space for shared memory
+
+// Call Rust function that operates on shared data
+RustBindings.createSharedData.invokeExact(sharedSegment);
+
+// Access shared data across threads (ensure proper synchronization in Java)
+synchronized (sharedSegment) {
+    // Safe access to shared memory here
+}
+</code></pre>
+<h3 id="explanation"><a class="header" href="#explanation">Explanation:</a></h3>
+<ul>
+<li><strong>Shared Arena</strong>: Ensures that memory is safely shared across threads in Java when interacting with Rust’s thread-safe types like <code>Arc</code> and <code>Mutex</code>.</li>
+<li><strong>Synchronized Block</strong>: Ensures that only one thread accesses the shared memory at a time, mimicking Rust’s ownership rules for shared data.</li>
+</ul>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="cha03-03.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
 
+                            <a rel="next prefetch" href="cha03-05.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
 
                         <div style="clear: both"></div>
                     </nav>
@@ -189,7 +230,13 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="cha03-03.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
 
+                    <a rel="next prefetch" href="cha03-05.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
             </nav>
 
         </div>
