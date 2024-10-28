@@ -1,6 +1,6 @@
 # Phantom Data
 Sometimes, when working with unsafe code, there may be a situation where
-lifetimes are associated with a struct, but not part of a field. For example:
+[lifetimes](lifetimes.md) are associated with a struct, but not part of a field. For example:
 ```rust,ignore
 struct Iter<'a, T: 'a> {
     ptr: *const T,
@@ -24,8 +24,8 @@ struct Iter<'a, T: 'a> {
 This way, the lifetime will be bounded to a “field” of the struct `Iter`. This may
 bring up complications when writing a tool that automatically generates
 bindings to call code because of the way it is designed. As previously
-explained, method handles must be written for the different types a
-function may be working with, and the [Foreign Function and Memory API](https://openjdk.org/jeps/454)
+explained, [method handles](method_handle.md) must be written for the different types a
+function may be working with, and the [FFM API](https://openjdk.org/jeps/454)
 may be incompatible or unable to accommodate for a case where
 `PhantomData` is used.
 Rust uses [unwinding](unwinding.md) to handle panics (unexpected errors) by default.

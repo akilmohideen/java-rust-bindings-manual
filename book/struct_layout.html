@@ -1,0 +1,319 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Struct Layout</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="title.html">Java Bindings for Rust: A Comprehensive Guide</a></li><li class="chapter-item expanded "><a href="cha01-00.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="cha01-01.html"><strong aria-hidden="true">1.1.</strong> Purpose of the Manual</a></li><li class="chapter-item expanded "><a href="cha01-02.html"><strong aria-hidden="true">1.2.</strong> Why Java 22?</a></li><li class="chapter-item expanded "><a href="cha01-03.html"><strong aria-hidden="true">1.3.</strong> How Java and Rust Work Together</a></li><li class="chapter-item expanded "><a href="cha01-04.html"><strong aria-hidden="true">1.4.</strong> What This Manual Hopes to Accomplish</a></li></ol></li><li class="chapter-item expanded "><a href="cha02-00.html"><strong aria-hidden="true">2.</strong> Setting Up and Linking Rust and Java</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="cha02-01.html"><strong aria-hidden="true">2.1.</strong> How Rust and Java Communicate</a></li><li class="chapter-item expanded "><a href="cha02-02.html"><strong aria-hidden="true">2.2.</strong> Setting Up Rust</a></li><li class="chapter-item expanded "><a href="cha02-03.html"><strong aria-hidden="true">2.3.</strong> Setting Up Java</a></li></ol></li><li class="chapter-item expanded "><a href="cha03-00.html"><strong aria-hidden="true">3.</strong> Mapping Rust Features to Java</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="cha03-02.html"><strong aria-hidden="true">3.1.</strong> Handling Ownership and Borrowing</a></li><li class="chapter-item expanded "><a href="cha03-03.html"><strong aria-hidden="true">3.2.</strong> Memory Layouts and Structs</a></li><li class="chapter-item expanded "><a href="cha03-04.html"><strong aria-hidden="true">3.3.</strong> Handling Thread Safety in Rust</a></li></ol></li><li class="chapter-item expanded "><a href="cha04-00.html"><strong aria-hidden="true">4.</strong> Handling Common Data Structures</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="cha04-01.html"><strong aria-hidden="true">4.1.</strong> Handling Rust Structs in Java</a></li><li class="chapter-item expanded "><a href="cha04-02.html"><strong aria-hidden="true">4.2.</strong> Handling Rust Arrays in Java</a></li><li class="chapter-item expanded "><a href="cha04-03.html"><strong aria-hidden="true">4.3.</strong> Handling Rust Vectors (Vec1) in Java</a></li><li class="chapter-item expanded "><a href="cha04-04.html"><strong aria-hidden="true">4.4.</strong> Handling Rust Slices (&[T] and &mut [T]) in Java</a></li></ol></li><li class="chapter-item expanded "><a href="cha05-00.html"><strong aria-hidden="true">5.</strong> Edge Cases and Troubleshooting</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="cha05-01.html"><strong aria-hidden="true">5.1.</strong> Handling Rust Lifetimes in Java</a></li><li class="chapter-item expanded "><a href="cha05-02.html"><strong aria-hidden="true">5.2.</strong> Handling Enums with Data Variants</a></li><li class="chapter-item expanded "><a href="cha05-03.html"><strong aria-hidden="true">5.3.</strong> WrongMethodTypeException in invokeExact()</a></li><li class="chapter-item expanded "><a href="cha05-04.html"><strong aria-hidden="true">5.4.</strong> Segmentation Fault or Undefined Behavior</a></li><li class="chapter-item expanded "><a href="cha05-05.html"><strong aria-hidden="true">5.5.</strong> UnsatisfiedLinkError When Loading Rust Shared Library</a></li></ol></li><li class="chapter-item expanded "><li class="part-title">Appendix</li><li class="chapter-item expanded "><a href="value_layout.html"><strong aria-hidden="true">6.</strong> Value Layout</a></li><li class="chapter-item expanded "><a href="method_handle.html"><strong aria-hidden="true">7.</strong> Method Handle</a></li><li class="chapter-item expanded "><a href="memory_layout.html"><strong aria-hidden="true">8.</strong> Memory Layout</a></li><li class="chapter-item expanded "><a href="memory_segment.html"><strong aria-hidden="true">9.</strong> Memory Segment</a></li><li class="chapter-item expanded "><a href="variable_handle.html"><strong aria-hidden="true">10.</strong> Variable Handle</a></li><li class="chapter-item expanded "><a href="function_descriptor.html"><strong aria-hidden="true">11.</strong> Function Descriptor</a></li><li class="chapter-item expanded "><a href="struct_layout.html" class="active"><strong aria-hidden="true">12.</strong> Struct Layout</a></li><li class="chapter-item expanded "><a href="union_layout.html"><strong aria-hidden="true">13.</strong> Union Layout</a></li><li class="chapter-item expanded "><a href="sequence_layout.html"><strong aria-hidden="true">14.</strong> Sequence Layout</a></li><li class="chapter-item expanded "><a href="arenas.html"><strong aria-hidden="true">15.</strong> Arena</a></li><li class="chapter-item expanded "><a href="so.html"><strong aria-hidden="true">16.</strong> Shared Object and Dynamic Library Files</a></li><li class="chapter-item expanded "><a href="ownership.html"><strong aria-hidden="true">17.</strong> Ownership</a></li><li class="chapter-item expanded "><a href="borrowing_and_aliasing.html"><strong aria-hidden="true">18.</strong> Borrowing and Aliasing</a></li><li class="chapter-item expanded "><a href="lifetimes.html"><strong aria-hidden="true">19.</strong> Lifetimes</a></li><li class="chapter-item expanded "><a href="sym_ex_gen.html"><strong aria-hidden="true">20.</strong> Symbols, Extern, and Generics</a></li><li class="chapter-item expanded "><a href="size_and_alignment.html"><strong aria-hidden="true">21.</strong> Size and Alignment</a></li><li class="chapter-item expanded "><a href="subtyping_and_variance.html"><strong aria-hidden="true">22.</strong> Subtyping and Variance</a></li><li class="chapter-item expanded "><a href="unwinding.html"><strong aria-hidden="true">23.</strong> Unwinding</a></li><li class="chapter-item expanded "><a href="phantom_data.html"><strong aria-hidden="true">24.</strong> Phantom Data</a></li><li class="chapter-item expanded "><a href="send_and_sync.html"><strong aria-hidden="true">25.</strong> Send and Sync</a></li><li class="chapter-item expanded "><a href="data_races.html"><strong aria-hidden="true">26.</strong> Data Races</a></li><li class="chapter-item expanded "><a href="atomics.html"><strong aria-hidden="true">27.</strong> Atomics</a></li><li class="chapter-item expanded "><a href="reordering.html"><strong aria-hidden="true">28.</strong> Compiler and Hardware Reordering</a></li><li class="chapter-item expanded "><a href="data_accesses.html"><strong aria-hidden="true">29.</strong> Data Accesses</a></li><li class="chapter-item expanded "><a href="orderings.html"><strong aria-hidden="true">30.</strong> Orderings</a></li><li class="chapter-item expanded "><a href="uninitialized_memory.html"><strong aria-hidden="true">31.</strong> Uninitialized Memory</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title"></h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="struct-layout"><a class="header" href="#struct-layout">Struct Layout</a></h1>
+<p>A <code>StructLayout</code> represents the layout of a C-style struct, including the layout
+of all its members, all their members (if applicable), and so on. It does
+exactly the same job as a struct definition in C. The class itself has no
+interesting methods, but you can create a StructLayout using
+<code>MemoryLayout.structLayout(MemoryLayout…)</code>. To translate the following
+structs to the Java <a href="https://openjdk.org/jeps/454">FFM API</a>, we would use the
+following Java code:</p>
+<p>C:</p>
+<pre><code class="language-c">struct foo {
+    int num;
+    char* string;
+    struct bar baz;
+}
+</code></pre>
+<p>Java:</p>
+<pre><code class="language-java">StructLayout bar = …;
+StructLayout foo = MemoryLayout.structLayout(
+    ValueLayout.JAVA_INT.withName(“num”),
+    ValueLayout.ADDRESS.withTargetLayout(0,
+        ValueLayout.JAVA_BYTE).withName(“string”),
+    bar.withName(“baz”)
+);
+</code></pre>
+<p>The <code>.withName(String)</code> method allows you to later retrieve a <a href="variable_handle.html"><code>VarHandle</code></a>
+using that name, covered in the <code>VarHandle</code> section.
+Constructing a <code>StructLayout</code> like this will automatically generate the
+appropriate total <a href="size_and_alignment.html">size and alignment</a>, as well as member offsets and padding
+that C would add on this platform. Generally, the size is greater than or
+equal to the sum of the sizes of the members (making room for padding as
+necessary to keep all members aligned) and the alignment is the maximum
+of the member alignments. Some exotic C programs may use overaligned
+structs<sup class="footnote-reference"><a href="#note">1</a></sup>, for which you can add a final
+<code>.withAlignment(alignment)</code> to override the automatic alignment calculated by
+Java.</p>
+<p>This all still applies to Rust, but only on:</p>
+<ol>
+<li><code>#[repr(C)]</code> structs</li>
+<li><code>#[repr(C)]</code> tuple structs<sup class="footnote-reference"><a href="#tuple">2</a></sup></li>
+<li><code>#[repr(integer type)]</code> enums with only valueless variants</li>
+<li>enums with
+exactly one nonnullable <code>#[repr(C)]</code> variant and up to one zero-sized variant<sup class="footnote-reference"><a href="#note2">3</a></sup></li>
+<li><code>#[repr(transparent)]</code> structs and tuple structs with exactly one <code>#[repr(C)]</code> member and all other members being zero-sized</li>
+</ol>
+<p><code>#[repr(C)]</code> requires all members, and members of members, and members of those members, etc. to be <code>#[repr(C)]</code> as well, which is very
+invasive to code. For the sake of performance, some may choose to do this,
+but it also greatly limits what you can use in the standard library.
+Common non <code>#[repr(C)]</code> types include:</p>
+<ol>
+<li><code>Vec</code></li>
+<li><code>String</code></li>
+<li><code>&amp;str</code></li>
+<li>slices</li>
+<li>anonymous</li>
+<li>tuples</li>
+<li><code>dyn</code> references</li>
+<li><code>Box&lt;dyn T&gt;</code></li>
+<li>most enums with a variant that holds a value (<code>Option&lt;T&gt;</code> for most <code>T</code>)</li>
+<li>all enums with more than one variant that holds a value</li>
+<li>every single container type<sup class="footnote-reference"><a href="#container">4</a></sup></li>
+</ol>
+<p>If a type uses any of these types (and most types from external libraries too) by
+value, that type cannot be <code>#[repr(C)]</code>. The only way around this restriction
+is through pointer indirection, like <code>Box&lt;T&gt;</code><sup class="footnote-reference"><a href="#box">5</a></sup>, because pointers are always
+representable even if the thing they are pointing to is not. People wanting
+every last ounce of performance can deal with this, but the average Rust
+type cannot, and so it cannot be represented as a <code>StructLayout</code> or a
+<a href="memory_layout.html"><code>MemoryLayout</code></a>. The last class important specifically to <code>StructLayout</code> is <code>PaddingLayout</code>. This is the layout of padding in StructLayouts. It exists purely to pad
+the struct.</p>
+<p>For more information on <code>StructLayout</code>, visit Oracle's <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/foreign/StructLayout.html">official documentation</a>.</p>
+<div class="footnote-definition" id="note"><sup class="footnote-definition-label">1</sup>
+<p>Many compilers accept <code>__attribute__((aligned(x)))</code> to align a struct
+to <code>x</code>, or they keep its original alignment if <code>x</code> is less than or equal to that. Rust
+has <code>#[align(x)]</code> to specify overalignment.</p>
+</div>
+<div class="footnote-definition" id="tuple"><sup class="footnote-definition-label">2</sup>
+<p>Tuple structs are just structs with anonymous members.</p>
+</div>
+<div class="footnote-definition" id="note2"><sup class="footnote-definition-label">3</sup>
+<p>This case exists pretty much purely to allow Option<reference> to be
+exchanged as a nullable pointer</p>
+</div>
+<div class="footnote-definition" id="container"><sup class="footnote-definition-label">4</sup>
+<p><code>VecDeque</code>, <code>HashMap</code>, <code>HashSet</code>,
+<code>BTreeMap</code>, <code>BTreeSet</code>, every iterator in the entire standard library, every IO
+type, every FS type (including <code>File</code>), <code>Rc</code>, <code>Arc</code>, <code>RefCell</code>, <code>RwLock</code>, <code>Mutex</code>.</p>
+</div>
+<div class="footnote-definition" id="box"><sup class="footnote-definition-label">5</sup>
+<p>Still doesn’t work for <code>dyn</code>, use
+<code>ThinBox</code> for that. <code>Box&lt;T&gt;</code> is guaranteed to be represented by just a pointer,
+semantically like one returned from malloc.</p>
+</div>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="function_descriptor.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="union_layout.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="function_descriptor.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="union_layout.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

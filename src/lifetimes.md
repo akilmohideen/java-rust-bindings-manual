@@ -2,7 +2,7 @@
 Rust constantly wants to know "what exactly is that reference referencing?". Most 
 things don’t live
 forever, so Rust also checks that developers don’t try to use it or reference it 
-after it has been moved. A move is a change in ownership which potentially means
+after it has been moved. A move is a change in [ownership](ownership.md) which potentially means
 physically moving it in memory and invalidating any pointers to it. `drop()`,
 for instance, takes ownership of an object so it can kill it. Anyone familiar
 with pointers in C has a decent understanding of the concept of

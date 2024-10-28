@@ -44,8 +44,8 @@ guarantees that in each thread, the ordering will be correct. Despite that,
 having different memory access speeds means that if two threads are
 accessing memories that are vastly different in retrieval speed, the order in
 which those threads run operations may be in the wrong order relative to
-each other. If you now take into consideration that a wrapper
-class (like the ones the provided automation tool will generate), ordering might be
+each other. If you now take a wrapper
+class into consideration, ordering might be
 thrown off even more. In these cases, Rust and Java’s atomic design 
 will put more strain on hardware by stalling some threads so that order guarantees
 are kept.
