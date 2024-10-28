@@ -16,7 +16,7 @@ types that cheat the aliasing and ownership rules like `UnsafeCell<T>` and
 `Rc<T>`.
 
 Luckily, Java actually allows for this to be enforced. `Arena.ofConfined()` gives us
-a thread-local memory [arena](arenas.md), and if code tries to use a `MemorySegment`
+a thread-local memory [arena](arenas.md), and if code tries to use a [`MemorySegment`](memory_segment.md)
 allocated from this arena in another thread it will throw an exception. This is
 an absolute life saver, as it allows for the use of `RefCell<T>`, which is neither
 Send nor Sync, and which is useful for fixing many of the incongruities

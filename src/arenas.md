@@ -1,10 +1,9 @@
 # Arenas
 Arenas are a way that Java provides developers to allocate memory in a way
 that is particularly useful for creating bindings. Arenas are like a
-stack of memory, and its space can be split in various ways, and its lifetime
+stack of memory, and its space can be split in various ways, and its [lifetime](lifetimes.md)
 can be set by various types. The main idea of where arenas can be used is
-that they can create space to store objects in Java called Memory
-Segments. These memory segments can store data such as
+that they can create space to store objects in Java called [Memory Segments](memory_segment.md). These memory segments can store data such as
 variables, data structures, and functions in a space that the garbage
 collector treats differently. That means information stored in
 these arenas can be passed to and from foreign functions without worrying about 
@@ -40,13 +39,13 @@ creating bindings as well, especially if it is not clear when a certain arena sh
 be closed. The only downside of the automatic arena is its interaction with the
 garbage collector. It is possible this could cause some sort of increased overhead.
 
-With an Arena, you can call `arena.allocate(size, alignment)` to allocate
+With an Arena, you can call `arena.allocate(`[`size, alignment`](size_and_alignment.md)`)` to allocate
 memory within the arena. Allocations cannot be individually freed with
 Arenas, it’s either all or nothing. Global Arenas
 are useful for set-and-forget things, like for loading the Rust library, since this
 does not need to be freed. Confined Arenas are good for data that cannot be
-safely shared across threads, so for types that don’t implement the Send
-trait. Auto Arenas are nice if it is difficult to figure out
+safely shared across threads, so for types that don’t implement the 
+[Send trait](send_and_sync.md). Auto Arenas are nice if it is difficult to figure out
 when something should be deallocated. Although this isn’t very common as `drop()` 
 should be called on Rust objects that require cleanup, and Java’s
 garbage collector will not take care of this.

@@ -1,6 +1,6 @@
 # Data Races
-Data races occur when multiple threads try to access the same memory
-segment, trying to write to it, and they can cause undefined behavior. Safe
+Data races occur when multiple threads try to access the same 
+[memory segment](memory_segment.md), trying to write to it, and they can cause undefined behavior. Safe
 Rust guarantees that no data races will occur, and a big player for this is the
 [ownership](ownership.md) model. By definition, if a value can only have one owner 
 (can make changes), then it can only be written to by its single owner. However,
