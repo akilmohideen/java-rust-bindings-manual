@@ -203,129 +203,150 @@ Rust is a system-level language that provides fine-grained control over memory m
 <div style="break-before: page; page-break-before: always;"></div><h1 id="setting-up-and-linking-rust-and-java"><a class="header" href="#setting-up-and-linking-rust-and-java">Setting Up and Linking Rust and Java</a></h1>
 <p>In this section, we will explain how to set up and link both Rust and Java code, in order to create Java bindings for Rust libraries. This process involves exporting Rust functions in a way Java can access, and using Java's <a href="https://openjdk.org/jeps/454">FFM API</a> to dynamically link to Rust code. We will also cover how to work with <a href="function_descriptor.html"><code>FunctionDescriptor</code></a>, <a href="arenas.html"><code>Arena</code></a>, <a href="memory_layout.html"><code>MemoryLayout</code></a>, and other key components necessary to ensure safe and efficient communication between Java and Rust.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="how-rust-and-java-communicate"><a class="header" href="#how-rust-and-java-communicate">How Rust and Java Communicate</a></h1>
-<p>Java and Rust communicate through <strong>dynamic linking</strong>, where Rust compiles into a <a href="so.html">shared library</a> file (e.g., <code>.dll</code> on Windows, <code>.so</code> on Linux, <code>.dylib</code> on macOS). Java loads this library and can interact with its functions.
-At a high level, the process looks like this:</p>
+<p>To enable communication between Rust and Java, Rust compiles code into a <a href="so.html">shared library</a> that Java can load and invoke using <a href="https://openjdk.org/jeps/454">FFM API</a></p>
+<p>This process requires separate files for Rust code and Java bindings, each with specific configurations and naming conventions. The file names and formats may vary depending on your operating system and Rust version.</p>
 <ul>
-<li><strong>Rust</strong>: Write Rust functions, export them with <code>#[no_mangle]</code> and <code>extern "C"</code>, and compile them into a shared library.</li>
-<li><strong>Java</strong>: Use the Java <a href="https://openjdk.org/jeps/454">FFM API</a> to load the shared library, find the Rust functions, and invoke them.</li>
+<li>
+<p><strong>Rust File</strong>: Contains the functions to be exposed to Java. This file is typically named lib.rs and located in the src/ directory of a Rust project.</p>
+</li>
+<li>
+<p><strong>Shared Library File</strong>: This is the compiled output of the Rust code. The file name and extension depend on your operating system.</p>
+<ul>
+<li>Windows: <code>FileName.dll</code></li>
+<li>Linux: <code>FileName.so</code></li>
+<li>macOS:  <code>FileName.dylib</code></li>
 </ul>
-<p>The next sections will go step by step through both the Rust and Java setups.</p>
+</li>
+<li>
+<p><strong>Java File</strong>: Contains the Java code that binds to the Rust shared library. You can name it based on your application, e.g., RustBindings.java.</p>
+</li>
+</ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="setting-up-rust"><a class="header" href="#setting-up-rust">Setting Up Rust</a></h1>
 <h2 id="step-1-exporting-rust-functions"><a class="header" href="#step-1-exporting-rust-functions">Step 1: Exporting Rust Functions</a></h2>
-<p>To make Rust functions callable from Java, we need to do two things:</p>
-<ul>
-<li>Use <a href="sym_ex_gen.html"><code>#[no_mangle]</code></a> to prevent Rust from renaming (mangling) the function name internally. This ensures Java can find the function by its exact name.</li>
-<li>Declare the function with <a href="sym_ex_gen.html"><code>extern "C"</code></a> to make sure it uses the <strong>C Application Binary Interface (ABI)</strong>, which Java understands.</li>
-</ul>
-<h3 id="rust-example"><a class="header" href="#rust-example">Rust Example:</a></h3>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>#[no_mangle]
-pub extern "C" fn create_point(x: i32, y: i32) -&gt; *mut Point {
-    Box::into_raw(Box::new(Point { x, y }))
-}
-
+<p>To make Rust functions callable from Java, you need to:</p>
+<ol>
+<li><strong>Prevent name mangling</strong>: Add <code>#[no_mangle]</code> to ensure Java can find the Rust function by its exact name.</li>
+<li><strong>Use the C ABI</strong>: Add <code>extern "C"</code> so the function adheres to the C Application Binary Interface (ABI), which Java can interact with.</li>
+</ol>
+<h3 id="before-adding-no_mangle-and-extern-c"><a class="header" href="#before-adding-no_mangle-and-extern-c">Before Adding #[no_mangle] and extern "C"</a></h3>
+<p>Here’s a simple Rust function that adds two numbers. This version cannot yet be used by Java because the function name will be mangled and will not conform to the C ABI.</p>
+<pre><code class="language-rust ignore">// Rust function: Adds two numbers
+pub fn add_numbers(x: i32, y: i32) -&gt; i32 {
+    x + y
+}</code></pre>
+<h3 id="after-adding-no_mangle-and-extern-c"><a class="header" href="#after-adding-no_mangle-and-extern-c">After Adding #[no_mangle] and extern “C"</a></h3>
+<p>To make the function callable from Java, modify it as follows:</p>
+<pre><code class="language-rust ignore">// Rust function: Adds two numbers
 #[no_mangle]
-pub extern "C" fn get_x(point: *mut Point) -&gt; i32 {
-    unsafe { (*point).x }
-}
-
-#[no_mangle]
-pub extern "C" fn free_point(point: *mut Point) {
-    unsafe { Box::from_raw(point); } // Frees the allocated memory
-}
-
-struct Point {
-    x: i32,
-    y: i32,
-}
-<span class="boring">}</span></code></pre></pre>
-<h3 id="explanation"><a class="header" href="#explanation">Explanation:</a></h3>
+pub extern "C" fn add_numbers(x: i32, y: i32) -&gt; i32 {
+    x + y
+}</code></pre>
+<h2 id="step-2-modify-cargotoml"><a class="header" href="#step-2-modify-cargotoml">Step 2: Modify Cargo.toml</a></h2>
+<p>Add the following to the Cargo.toml file to specify that the library should be compiled as a <a href="so.html">shared library</a>:</p>
+<pre><code class="language-toml">[lib] 
+crate-type = [“cdylib”]
+</code></pre>
+<h2 id="step-3-build-cargotoml"><a class="header" href="#step-3-build-cargotoml">Step 3: Build Cargo.toml</a></h2>
+<p>Run the following command to compile the Rust project into a shared library:
+<code>cargo build --release</code></p>
+<p><strong>Output</strong>: The shared library will be generated in the <code>target/release/</code> directory.</p>
 <ul>
-<li><code>*mut Point:</code> The function returns a raw pointer (<code>*mut Point</code>), which Java can manage using the <a href="https://openjdk.org/jeps/454">FFM API</a>.</li>
+<li>On Windows: <code>FileName.dll</code></li>
+<li>On Linux: <code>FileName.so</code></li>
+<li>On macOS: <code>FileName.dylib</code></li>
 </ul>
-<h2 id="step-2-compiling-rust-into-a-shared-library"><a class="header" href="#step-2-compiling-rust-into-a-shared-library">Step 2: Compiling Rust into a Shared Library</a></h2>
-<p>To compile the Rust code into a format Java can load, modify the <code>Cargo.toml</code> file:</p>
-<pre><code class="language-toml">[lib]
-crate-type = ["cdylib"]
+<h2 id="file-organization-example"><a class="header" href="#file-organization-example">File Organization Example</a></h2>
+<p>Here’s how your project should look after building the shared library:</p>
+<pre><code class="language-bash">rust_project/
+├── src/
+│   └── lib.rs          # Contains the Rust function
+├── Cargo.toml          # Rust project configuration
+└── target/
+    └── release/
+        └── librust_lib.dylib  # Shared library (for macOS)
 </code></pre>
-<p>Then, compile the Rust project into a <a href="so.html">shared library</a>:</p>
-<pre><code class="language-bash">cargo build --release
-</code></pre>
-<p>This command will generate a shared library file (e.g., <code>libmyrustlib.so</code> or <code>myrustlib.dll</code>) in the <code>target/release/</code> directory, which Java can dynamically load.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="setting-up-java"><a class="header" href="#setting-up-java">Setting Up Java</a></h1>
-<p>Once the Rust library is compiled, Java can load the <a href="so.html">shared library</a> and access the Rust functions.</p>
-<h2 id="step-1-loading-the-rust-shared-library"><a class="header" href="#step-1-loading-the-rust-shared-library">Step 1: Loading the Rust Shared Library</a></h2>
-<p>Java uses <strong><code>SymbolLookup</code></strong> to load the shared library and retrieve the addresses of the Rust functions. Java’s <strong><code>Linker</code></strong> allows us to bind those addresses to callable <a href="method_handle.html"><code>MethodHandle</code></a> objects, which represent native functions in Java.
-Here’s how to load the Rust library and link the <code>create_point</code> function:</p>
-<h3 id="java-example"><a class="header" href="#java-example">Java Example</a></h3>
-<pre><code class="language-java">import java.lang.foreign.*;
+<h2 id="creating-a-methodhandle-for-rust-functions"><a class="header" href="#creating-a-methodhandle-for-rust-functions">Creating a MethodHandle for Rust Functions</a></h2>
+<p>Set up a <a href="method_handle.html"><code>MethodHandle</code></a>: This will act as a function name wrapper in Java, allowing you to call Rust functions as if they were Java methods.</p>
+<pre><code class="language-java">public class ClassName {
+    static MethodHandle yourMethodName;// Creates MethodHandle
+    // ...
+}
+</code></pre>
+<p>Create a <code>static</code> block:
+This block initializes the native linker and loads the Rust library.</p>
+<h3 id="step-by-step-inside-the-static-block"><a class="header" href="#step-by-step-inside-the-static-block">Step-by-Step: Inside the static Block</a></h3>
+<ol>
+<li><strong>Initialize the Native Linker</strong></li>
+</ol>
+<pre><code class="language-java">static{
+    Linker linker = Linker.nativeLinker(); // Initializes the native linker
+    ...
+}  
+</code></pre>
+<p>The linker is used to bind Java code to native functions from the Rust library.</p>
+<ol start="2">
+<li><strong>Load the Rust Shared Library</strong></li>
+</ol>
+<pre><code class="language-java">SymbolLookup lib = SymbolLookup.libraryLookup("/* path/to/your/FileName.dylib */", Arena.global()); // Loads the Rust library
+</code></pre>
+<p>Replace "<code>/* path/to/your/FileName.dylib */</code>" with the actual path to the shared library (e.g., <code>librust_lib.dylib</code> on macOS).
+<a href="arenas.html"><code>The Arena.global()</code></a> ensures global memory scope for linked symbols.</p>
+<ol start="3">
+<li><strong>Link the Functions</strong></li>
+</ol>
+<pre><code class="language-java"> yourMethodName = linker.downcallHandle(
+    lib.find("/* function_name */").orElseThrow(), // Replace with the Rust function name
+    FunctionDescriptor.of(
+        ValueLayout.JAVA_INT,                     // Match Java's return type to Rust's return type
+        ValueLayout.JAVA_INT,                     // Match Java's first parameter type to Rust's first parameter type
+        ValueLayout.JAVA_INT                      // Match Java's second parameter type to Rust's second parameter type
+    )
+);
+</code></pre>
+<ul>
+<li>Replace <code>/* function_name */</code> with the name of your Rust function (e.g., <code>add_numbers</code>).</li>
+<li>Use <code>FunctionDescriptor</code> to map Java types to Rust types.</li>
+<li>Refer to the <a href="value_layout.html">Value Layout</a> appendix for a full table of Java and Rust type mappings.</li>
+</ul>
+<h2 id="full-java-binding-for-adding-two-numbers"><a class="header" href="#full-java-binding-for-adding-two-numbers">Full Java Binding for Adding Two Numbers</a></h2>
+<pre><code class="language-java">
+import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
 
 public class RustBindings {
-    static MethodHandle createPoint;
-    static MethodHandle getX;
-    static MethodHandle freePoint;
+    static MethodHandle addNumbers; // Wrapper for the Rust function
 
     static {
-        var linker = Linker.nativeLinker(); // Initializes the native linker
-        var lib = SymbolLookup.libraryLookup("libmyrustlib.so", Arena.global()); // Loads the Rust library
+        // Initialize the linker
+        Linker linker = Linker.nativeLinker();
 
-        // Link the Rust functions
-        createPoint = linker.downcallHandle(
-            lib.find("create_point").orElseThrow(), 
-            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT)
-        );
-        getX = linker.downcallHandle(
-            lib.find("get_x").orElseThrow(), 
-            FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS)
-        );
-        freePoint = linker.downcallHandle(
-            lib.find("free_point").orElseThrow(), 
-            FunctionDescriptor.ofVoid(ValueLayout.ADDRESS)
+        // Load the Rust library
+        SymbolLookup lib = SymbolLookup.libraryLookup("/* path/to/your/FileName.dylib */", Arena.global());
+
+        // Link the Rust function
+        addNumbers = linker.downcallHandle(
+            lib.find("add_numbers").orElseThrow(), // Replace with the function name from Rust
+            FunctionDescriptor.of(
+                ValueLayout.JAVA_INT,              // Rust's return type: i32
+                ValueLayout.JAVA_INT,              // Rust's first parameter: i32
+                ValueLayout.JAVA_INT               // Rust's second parameter: i32
+            )
         );
     }
 }
 </code></pre>
-<h3 id="explanation-1"><a class="header" href="#explanation-1">Explanation:</a></h3>
-<ul>
-<li><strong><code>libraryLookup</code></strong>: Loads the Rust shared library (<code>libmyrustlib.so</code>). The library must be available in the Java classpath or in the system’s library path.</li>
-<li><strong><a href="function_descriptor.html"><code>FunctionDescriptor</code></a></strong>: Defines the signature of the Rust function in Java terms. For example:
-<ul>
-<li><strong><a href="value_layout.html"><code>ValueLayout</code></a><code>.ADDRESS</code></strong>: Corresponds to a pointer (Rust’s <code>*mut</code>).</li>
-<li><strong><code>ValueLayout.JAVA_INT</code></strong>: Corresponds to Rust’s <code>i32</code>.</li>
-</ul>
-</li>
-<li>MethodHandle: Represents the linked Rust function. This is how Java will call the Rust function.</li>
-</ul>
-<h2 id="step-2-calling-rust-functions-from-java"><a class="header" href="#step-2-calling-rust-functions-from-java">Step 2: Calling Rust Functions from Java</a></h2>
-<p>With the library loaded and the functions linked, we can now call the Rust functions from Java using <code>MethodHandle.invokeExact()</code>. Here’s how to create a point in Rust, get its <code>x</code> value, and free the memory:</p>
-<h3 id="java-example-1"><a class="header" href="#java-example-1">Java Example</a></h3>
+<p><strong>Main</strong></p>
 <pre><code class="language-java">public class Main {
     public static void main(String[] args) throws Throwable {
-        // Create a point in Rust
-        MemorySegment point = (MemorySegment) RustBindings.createPoint.invokeExact(10, 20);
-
-        // Get the x value from the point
-        int xValue = (int) RustBindings.getX.invokeExact(point);
-        System.out.println("X value: " + xValue);
-
-        // Free the Rust point
-        RustBindings.freePoint.invokeExact(point);
+        // Call the Rust function
+        int result = (int) RustBindings.addNumbers.invokeExact(10, 20);
+        System.out.println("Result: " + result); // Output should be 30
     }
 }
 </code></pre>
-<h3 id="explanation-2"><a class="header" href="#explanation-2">Explanation:</a></h3>
-<ul>
-<li><strong><a href="memory_segment.html"><code>MemorySegment</code></a></strong>: This is Java’s way of handling memory passed to and from Rust. Here, it represents the raw pointer to the Rust Point structure.</li>
-<li><strong><code>invokeExact()</code></strong>: Calls the linked Rust function with the specified arguments. In this case:
-<ul>
-<li><code>RustBindings.createPoint.invokeExact(10, 20)</code> creates a <code>Point</code> in Rust with <code>x = 10</code> and <code>y = 20</code>.</li>
-<li><code>RustBindings.getX.invokeExact(point)</code> retrieves the <code>x</code> value from the Rust point.</li>
-<li><code>RustBindings.freePoint.invokeExact(point)</code> frees the memory in Rust.</li>
-</ul>
-</li>
-</ul>
+<p>Make sure to add <code>throws Throwable</code> to main function.</p>
+<p><code>.invokeExact()</code> is a powerful and strict method for calling functions using a <code>MethodHandle</code>. It ensures precise type matching, which is especially important for interoperability with external libraries (like Rust) where argument types are fixed. Always ensure that the types match exactly to avoid runtime exceptions.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="mapping-rust-features-to-java"><a class="header" href="#mapping-rust-features-to-java">Mapping Rust Features to Java</a></h1>
 <p>This section will cover how to properly account for features that are important to Rust. For each Rust concept, the process to Identify a feature and handle it properly in Java will be shown.</p>
 <p>By the end of this section, the steps to analyze a Rust function, and determine what needs to be written in Java to bind it correctly, will be clear. This includes handling <a href="lifetimes.html">lifetimes</a>, <a href="ownership.html">ownership</a>, <a href="memory_layout.html">memory layouts</a>, thread safety, and more.</p>
@@ -362,7 +383,7 @@ RustBindings.takeOwnership.invokeExact(rustBox);
 // Manually free the Box when done 
 RustBindings.freeBox.invokeExact(rustBox); // Ensures no memory leaks
 </code></pre>
-<h3 id="explanation-3"><a class="header" href="#explanation-3">Explanation:</a></h3>
+<h3 id="explanation"><a class="header" href="#explanation">Explanation:</a></h3>
 <p><a href="memory_segment.html">MemorySegment</a> represents the Rust-allocated memory in Java. After transferring ownership to Rust, Java explicitly calls <code>freeBox</code> to release the memory.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="memory-layouts-and-structs"><a class="header" href="#memory-layouts-and-structs">Memory Layouts and Structs</a></h1>
 <h2 id="identifying-structs-and-memory-layouts-in-rust"><a class="header" href="#identifying-structs-and-memory-layouts-in-rust">Identifying Structs and Memory Layouts in Rust</a></h2>
@@ -401,7 +422,7 @@ VarHandle yHandle = pointLayout.varHandle(PathElement.groupElement("y"));
 xHandle.set(pointSegment, 0, 10);  // Set x to 10
 yHandle.set(pointSegment, 0, 20);  // Set y to 20
 </code></pre>
-<h2 id="explanation-4"><a class="header" href="#explanation-4">Explanation:</a></h2>
+<h2 id="explanation-1"><a class="header" href="#explanation-1">Explanation:</a></h2>
 <ul>
 <li><a href="struct_layout.html"><strong>StructLayout</strong></a>: Defines the layout of the Rust <code>Point</code> struct, where each field is aligned according to its type (in this case, both fields are <code>i32</code>, so each is 4 bytes).</li>
 <li><a href="variable_handle.html"><strong>VarHandle</strong></a>: Used to access and set individual fields (<code>x</code> and <code>y</code>) in the memory segment allocated for the struct.</li>
@@ -440,7 +461,7 @@ synchronized (sharedSegment) {
     // Safe access to shared memory here
 }
 </code></pre>
-<h3 id="explanation-5"><a class="header" href="#explanation-5">Explanation:</a></h3>
+<h3 id="explanation-2"><a class="header" href="#explanation-2">Explanation:</a></h3>
 <ul>
 <li><strong>Shared Arena</strong>: Ensures that memory is safely shared across threads in Java when interacting with Rust’s thread-safe types like <code>Arc</code> and <code>Mutex</code>.</li>
 <li><strong>Synchronized Block</strong>: Ensures that only one thread accesses the shared memory at a time, mimicking Rust’s ownership rules for shared data.</li>
@@ -475,7 +496,7 @@ struct Point {
 VarHandle xHandle = pointLayout.varHandle(PathElement.groupElement("x"));
 VarHandle yHandle = pointLayout.varHandle(PathElement.groupElement("y"));
 </code></pre>
-<h3 id="explanation-6"><a class="header" href="#explanation-6">Explanation:</a></h3>
+<h3 id="explanation-3"><a class="header" href="#explanation-3">Explanation:</a></h3>
 <ul>
 <li><code>ValueLayout.JAVA_INT</code>: This matches Rust’s i32 type.</li>
 <li><code>withName("x")</code> and <code>withName("y")</code>: Naming each field lets us retrieve a VarHandle to read and write to specific fields of the MemorySegment that represents the Rust struct.</li>
@@ -492,7 +513,7 @@ yHandle.set(pointSegment, 0, 20);  // Set y = 20
 int x = (int) xHandle.get(pointSegment);  // Get x value
 int y = (int) yHandle.get(pointSegment);  // Get y value
 </code></pre>
-<h3 id="explanation-7"><a class="header" href="#explanation-7">Explanation:</a></h3>
+<h3 id="explanation-4"><a class="header" href="#explanation-4">Explanation:</a></h3>
 <p><strong>Arena Allocation</strong>: Using an arena (e.g., <code>Arena.ofConfined()</code>) ensures the struct’s memory is safely managed.</p>
 <p><strong>Set and Get Values</strong>: <code>VarHandle</code> operations allow us to interact with Rust struct fields directly, facilitating cross-language data manipulation.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="handling-rust-arrays-in-java"><a class="header" href="#handling-rust-arrays-in-java">Handling Rust Arrays in Java</a></h1>
@@ -842,23 +863,25 @@ well, primitives. They are:
 primitives (<code>ADDRESS</code> is a bit special), <a href="size_and_alignment.html">aligned and unaligned</a>, which have
 direct mappings to C primitive types.<br />
 <br></p>
-<div class="table-wrapper"><table><thead><tr><th><strong>Java Type</strong></th><th><strong>C Type</strong></th><th><strong>Rust Type</strong></th></tr></thead><tbody>
-<tr><td>ValueLayout.ADDRESS</td><td>pointer</td><td>pointer or Option&lt;reference&gt;</td></tr>
-<tr><td>ValueLayout.ADDRESS_UNALIGNED</td><td>pointer with alignment 1</td><td>ditto with alignment 1</td></tr>
-<tr><td>ValueLayout.JAVA_BOOLEAN</td><td>char but must be 0 or 1</td><td>bool</td></tr>
-<tr><td>ValueLayout.JAVA_BYTE</td><td>char</td><td>i8</td></tr>
-<tr><td>ValueLayout.JAVA_CHAR</td><td>short storing a UTF-16 codepoint</td><td>u16 storing a UTF-16 codepoint</td></tr>
-<tr><td>ValueLayout.JAVA_CHAR_UNALIGNED</td><td>ditto with alignment 1</td><td>ditto with alignment 1</td></tr>
-<tr><td>ValueLayout.JAVA_DOUBLE</td><td>double</td><td>f64</td></tr>
-<tr><td>ValueLayout.JAVA_DOUBLE_UNALIGNED</td><td>f64 with alignment 1</td><td></td></tr>
-<tr><td>ValueLayout.JAVA_FLOAT</td><td>float</td><td>f32</td></tr>
-<tr><td>ValueLayout.JAVA_FLOAT_UNALIGNED</td><td>float with alignment 1</td><td>f32 with alignment 1</td></tr>
-<tr><td>ValueLayout.JAVA_INT</td><td>int</td><td>i32</td></tr>
-<tr><td>ValueLayout.JAVA_INT_UNALIGNED</td><td>int with alignment 1</td><td>i32 with alignment 1</td></tr>
-<tr><td>ValueLayout.JAVA_LONG</td><td>long</td><td>i64</td></tr>
-<tr><td>ValueLayout.JAVA_LONG_UNALIGNED</td><td>long with alignment 1</td><td>i64 with alignment 1</td></tr>
-<tr><td>ValueLayout.JAVA_SHORT</td><td>short</td><td>i16</td></tr>
-<tr><td>ValueLayout.JAVA_SHORT_UNALIGNED</td><td>short with alignment 1</td><td>i16 with alignment 1</td></tr>
+<h2 id="type-mappings-java-c-and-rust"><a class="header" href="#type-mappings-java-c-and-rust">Type Mappings: Java, C, and Rust</a></h2>
+<div class="table-wrapper"><table><thead><tr><th><strong>Java Type</strong></th><th><strong>C Type</strong></th><th><strong>Rust Type</strong></th><th><strong>Description</strong></th></tr></thead><tbody>
+<tr><td><code>ValueLayout.ADDRESS</code></td><td>Pointer</td><td><code>*mut</code>, <code>*const</code></td><td>Pointer to a memory location.</td></tr>
+<tr><td><code>ValueLayout.JAVA_INT</code></td><td><code>int</code></td><td><code>i32</code></td><td>32-bit signed integer.</td></tr>
+<tr><td><code>ValueLayout.JAVA_LONG</code></td><td><code>long</code></td><td><code>i64</code></td><td>64-bit signed integer.</td></tr>
+<tr><td><code>ValueLayout.JAVA_SHORT</code></td><td><code>short</code></td><td><code>i16</code></td><td>16-bit signed integer.</td></tr>
+<tr><td><code>ValueLayout.JAVA_BYTE</code></td><td><code>char</code></td><td><code>i8</code></td><td>8-bit signed integer.</td></tr>
+<tr><td><code>ValueLayout.JAVA_BOOLEAN</code></td><td><code>char (0 or 1)</code></td><td><code>bool</code></td><td>Boolean value (true or false).</td></tr>
+<tr><td><code>ValueLayout.JAVA_FLOAT</code></td><td><code>float</code></td><td><code>f32</code></td><td>32-bit floating-point number.</td></tr>
+<tr><td><code>ValueLayout.JAVA_DOUBLE</code></td><td><code>double</code></td><td><code>f64</code></td><td>64-bit floating-point number.</td></tr>
+<tr><td><code>ValueLayout.JAVA_CHAR</code></td><td><code>short (UTF-16)</code></td><td><code>u16</code></td><td>16-bit unsigned integer for UTF-16.</td></tr>
+</tbody></table>
+</div>
+<h2 id="unsigned-types"><a class="header" href="#unsigned-types">Unsigned Types</a></h2>
+<div class="table-wrapper"><table><thead><tr><th><strong>Java Type</strong></th><th><strong>C Type</strong></th><th><strong>Rust Type</strong></th><th><strong>Description</strong></th></tr></thead><tbody>
+<tr><td><code>ValueLayout.JAVA_INT</code></td><td><code>unsigned int</code></td><td><code>u8</code></td><td>8-bit unsigned integer.</td></tr>
+<tr><td><code>ValueLayout.JAVA_INT</code></td><td><code>unsigned int</code></td><td><code>u16</code></td><td>16-bit unsigned integer.</td></tr>
+<tr><td><code>ValueLayout.JAVA_LONG</code></td><td><code>unsigned long</code></td><td><code>u32</code></td><td>32-bit unsigned integer.</td></tr>
+<tr><td><code>ValueLayout.JAVA_LONG</code></td><td><code>unsigned long</code></td><td><code>u64</code></td><td>64-bit unsigned integer.</td></tr>
 </tbody></table>
 </div><br>  
 <p>So the <code>_UNALIGNED</code> versions are exactly the same as their counterparts

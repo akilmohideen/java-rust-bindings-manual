@@ -174,78 +174,87 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="setting-up-java"><a class="header" href="#setting-up-java">Setting Up Java</a></h1>
-<p>Once the Rust library is compiled, Java can load the <a href="so.html">shared library</a> and access the Rust functions.</p>
-<h2 id="step-1-loading-the-rust-shared-library"><a class="header" href="#step-1-loading-the-rust-shared-library">Step 1: Loading the Rust Shared Library</a></h2>
-<p>Java uses <strong><code>SymbolLookup</code></strong> to load the shared library and retrieve the addresses of the Rust functions. Java’s <strong><code>Linker</code></strong> allows us to bind those addresses to callable <a href="method_handle.html"><code>MethodHandle</code></a> objects, which represent native functions in Java.
-Here’s how to load the Rust library and link the <code>create_point</code> function:</p>
-<h3 id="java-example"><a class="header" href="#java-example">Java Example</a></h3>
-<pre><code class="language-java">import java.lang.foreign.*;
+<h2 id="creating-a-methodhandle-for-rust-functions"><a class="header" href="#creating-a-methodhandle-for-rust-functions">Creating a MethodHandle for Rust Functions</a></h2>
+<p>Set up a <a href="method_handle.html"><code>MethodHandle</code></a>: This will act as a function name wrapper in Java, allowing you to call Rust functions as if they were Java methods.</p>
+<pre><code class="language-java">public class ClassName {
+    static MethodHandle yourMethodName;// Creates MethodHandle
+    // ...
+}
+</code></pre>
+<p>Create a <code>static</code> block:
+This block initializes the native linker and loads the Rust library.</p>
+<h3 id="step-by-step-inside-the-static-block"><a class="header" href="#step-by-step-inside-the-static-block">Step-by-Step: Inside the static Block</a></h3>
+<ol>
+<li><strong>Initialize the Native Linker</strong></li>
+</ol>
+<pre><code class="language-java">static{
+    Linker linker = Linker.nativeLinker(); // Initializes the native linker
+    ...
+}  
+</code></pre>
+<p>The linker is used to bind Java code to native functions from the Rust library.</p>
+<ol start="2">
+<li><strong>Load the Rust Shared Library</strong></li>
+</ol>
+<pre><code class="language-java">SymbolLookup lib = SymbolLookup.libraryLookup("/* path/to/your/FileName.dylib */", Arena.global()); // Loads the Rust library
+</code></pre>
+<p>Replace "<code>/* path/to/your/FileName.dylib */</code>" with the actual path to the shared library (e.g., <code>librust_lib.dylib</code> on macOS).
+<a href="arenas.html"><code>The Arena.global()</code></a> ensures global memory scope for linked symbols.</p>
+<ol start="3">
+<li><strong>Link the Functions</strong></li>
+</ol>
+<pre><code class="language-java"> yourMethodName = linker.downcallHandle(
+    lib.find("/* function_name */").orElseThrow(), // Replace with the Rust function name
+    FunctionDescriptor.of(
+        ValueLayout.JAVA_INT,                     // Match Java's return type to Rust's return type
+        ValueLayout.JAVA_INT,                     // Match Java's first parameter type to Rust's first parameter type
+        ValueLayout.JAVA_INT                      // Match Java's second parameter type to Rust's second parameter type
+    )
+);
+</code></pre>
+<ul>
+<li>Replace <code>/* function_name */</code> with the name of your Rust function (e.g., <code>add_numbers</code>).</li>
+<li>Use <code>FunctionDescriptor</code> to map Java types to Rust types.</li>
+<li>Refer to the <a href="value_layout.html">Value Layout</a> appendix for a full table of Java and Rust type mappings.</li>
+</ul>
+<h2 id="full-java-binding-for-adding-two-numbers"><a class="header" href="#full-java-binding-for-adding-two-numbers">Full Java Binding for Adding Two Numbers</a></h2>
+<pre><code class="language-java">
+import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
 
 public class RustBindings {
-    static MethodHandle createPoint;
-    static MethodHandle getX;
-    static MethodHandle freePoint;
+    static MethodHandle addNumbers; // Wrapper for the Rust function
 
     static {
-        var linker = Linker.nativeLinker(); // Initializes the native linker
-        var lib = SymbolLookup.libraryLookup("libmyrustlib.so", Arena.global()); // Loads the Rust library
+        // Initialize the linker
+        Linker linker = Linker.nativeLinker();
 
-        // Link the Rust functions
-        createPoint = linker.downcallHandle(
-            lib.find("create_point").orElseThrow(), 
-            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT)
-        );
-        getX = linker.downcallHandle(
-            lib.find("get_x").orElseThrow(), 
-            FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS)
-        );
-        freePoint = linker.downcallHandle(
-            lib.find("free_point").orElseThrow(), 
-            FunctionDescriptor.ofVoid(ValueLayout.ADDRESS)
+        // Load the Rust library
+        SymbolLookup lib = SymbolLookup.libraryLookup("/* path/to/your/FileName.dylib */", Arena.global());
+
+        // Link the Rust function
+        addNumbers = linker.downcallHandle(
+            lib.find("add_numbers").orElseThrow(), // Replace with the function name from Rust
+            FunctionDescriptor.of(
+                ValueLayout.JAVA_INT,              // Rust's return type: i32
+                ValueLayout.JAVA_INT,              // Rust's first parameter: i32
+                ValueLayout.JAVA_INT               // Rust's second parameter: i32
+            )
         );
     }
 }
 </code></pre>
-<h3 id="explanation"><a class="header" href="#explanation">Explanation:</a></h3>
-<ul>
-<li><strong><code>libraryLookup</code></strong>: Loads the Rust shared library (<code>libmyrustlib.so</code>). The library must be available in the Java classpath or in the system’s library path.</li>
-<li><strong><a href="function_descriptor.html"><code>FunctionDescriptor</code></a></strong>: Defines the signature of the Rust function in Java terms. For example:
-<ul>
-<li><strong><a href="value_layout.html"><code>ValueLayout</code></a><code>.ADDRESS</code></strong>: Corresponds to a pointer (Rust’s <code>*mut</code>).</li>
-<li><strong><code>ValueLayout.JAVA_INT</code></strong>: Corresponds to Rust’s <code>i32</code>.</li>
-</ul>
-</li>
-<li>MethodHandle: Represents the linked Rust function. This is how Java will call the Rust function.</li>
-</ul>
-<h2 id="step-2-calling-rust-functions-from-java"><a class="header" href="#step-2-calling-rust-functions-from-java">Step 2: Calling Rust Functions from Java</a></h2>
-<p>With the library loaded and the functions linked, we can now call the Rust functions from Java using <code>MethodHandle.invokeExact()</code>. Here’s how to create a point in Rust, get its <code>x</code> value, and free the memory:</p>
-<h3 id="java-example-1"><a class="header" href="#java-example-1">Java Example</a></h3>
+<p><strong>Main</strong></p>
 <pre><code class="language-java">public class Main {
     public static void main(String[] args) throws Throwable {
-        // Create a point in Rust
-        MemorySegment point = (MemorySegment) RustBindings.createPoint.invokeExact(10, 20);
-
-        // Get the x value from the point
-        int xValue = (int) RustBindings.getX.invokeExact(point);
-        System.out.println("X value: " + xValue);
-
-        // Free the Rust point
-        RustBindings.freePoint.invokeExact(point);
+        // Call the Rust function
+        int result = (int) RustBindings.addNumbers.invokeExact(10, 20);
+        System.out.println("Result: " + result); // Output should be 30
     }
 }
 </code></pre>
-<h3 id="explanation-1"><a class="header" href="#explanation-1">Explanation:</a></h3>
-<ul>
-<li><strong><a href="memory_segment.html"><code>MemorySegment</code></a></strong>: This is Java’s way of handling memory passed to and from Rust. Here, it represents the raw pointer to the Rust Point structure.</li>
-<li><strong><code>invokeExact()</code></strong>: Calls the linked Rust function with the specified arguments. In this case:
-<ul>
-<li><code>RustBindings.createPoint.invokeExact(10, 20)</code> creates a <code>Point</code> in Rust with <code>x = 10</code> and <code>y = 20</code>.</li>
-<li><code>RustBindings.getX.invokeExact(point)</code> retrieves the <code>x</code> value from the Rust point.</li>
-<li><code>RustBindings.freePoint.invokeExact(point)</code> frees the memory in Rust.</li>
-</ul>
-</li>
-</ul>
+<p>Make sure to add <code>throws Throwable</code> to main function.</p>
+<p><code>.invokeExact()</code> is a powerful and strict method for calling functions using a <code>MethodHandle</code>. It ensures precise type matching, which is especially important for interoperability with external libraries (like Rust) where argument types are fixed. Always ensure that the types match exactly to avoid runtime exceptions.</p>
 
                     </main>
 

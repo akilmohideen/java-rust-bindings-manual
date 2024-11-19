@@ -175,47 +175,48 @@
                     <main>
                         <h1 id="setting-up-rust"><a class="header" href="#setting-up-rust">Setting Up Rust</a></h1>
 <h2 id="step-1-exporting-rust-functions"><a class="header" href="#step-1-exporting-rust-functions">Step 1: Exporting Rust Functions</a></h2>
-<p>To make Rust functions callable from Java, we need to do two things:</p>
-<ul>
-<li>Use <a href="sym_ex_gen.html"><code>#[no_mangle]</code></a> to prevent Rust from renaming (mangling) the function name internally. This ensures Java can find the function by its exact name.</li>
-<li>Declare the function with <a href="sym_ex_gen.html"><code>extern "C"</code></a> to make sure it uses the <strong>C Application Binary Interface (ABI)</strong>, which Java understands.</li>
-</ul>
-<h3 id="rust-example"><a class="header" href="#rust-example">Rust Example:</a></h3>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>#[no_mangle]
-pub extern "C" fn create_point(x: i32, y: i32) -&gt; *mut Point {
-    Box::into_raw(Box::new(Point { x, y }))
-}
-
+<p>To make Rust functions callable from Java, you need to:</p>
+<ol>
+<li><strong>Prevent name mangling</strong>: Add <code>#[no_mangle]</code> to ensure Java can find the Rust function by its exact name.</li>
+<li><strong>Use the C ABI</strong>: Add <code>extern "C"</code> so the function adheres to the C Application Binary Interface (ABI), which Java can interact with.</li>
+</ol>
+<h3 id="before-adding-no_mangle-and-extern-c"><a class="header" href="#before-adding-no_mangle-and-extern-c">Before Adding #[no_mangle] and extern "C"</a></h3>
+<p>Here’s a simple Rust function that adds two numbers. This version cannot yet be used by Java because the function name will be mangled and will not conform to the C ABI.</p>
+<pre><code class="language-rust ignore">// Rust function: Adds two numbers
+pub fn add_numbers(x: i32, y: i32) -&gt; i32 {
+    x + y
+}</code></pre>
+<h3 id="after-adding-no_mangle-and-extern-c"><a class="header" href="#after-adding-no_mangle-and-extern-c">After Adding #[no_mangle] and extern “C"</a></h3>
+<p>To make the function callable from Java, modify it as follows:</p>
+<pre><code class="language-rust ignore">// Rust function: Adds two numbers
 #[no_mangle]
-pub extern "C" fn get_x(point: *mut Point) -&gt; i32 {
-    unsafe { (*point).x }
-}
-
-#[no_mangle]
-pub extern "C" fn free_point(point: *mut Point) {
-    unsafe { Box::from_raw(point); } // Frees the allocated memory
-}
-
-struct Point {
-    x: i32,
-    y: i32,
-}
-<span class="boring">}</span></code></pre></pre>
-<h3 id="explanation"><a class="header" href="#explanation">Explanation:</a></h3>
+pub extern "C" fn add_numbers(x: i32, y: i32) -&gt; i32 {
+    x + y
+}</code></pre>
+<h2 id="step-2-modify-cargotoml"><a class="header" href="#step-2-modify-cargotoml">Step 2: Modify Cargo.toml</a></h2>
+<p>Add the following to the Cargo.toml file to specify that the library should be compiled as a <a href="so.html">shared library</a>:</p>
+<pre><code class="language-toml">[lib] 
+crate-type = [“cdylib”]
+</code></pre>
+<h2 id="step-3-build-cargotoml"><a class="header" href="#step-3-build-cargotoml">Step 3: Build Cargo.toml</a></h2>
+<p>Run the following command to compile the Rust project into a shared library:
+<code>cargo build --release</code></p>
+<p><strong>Output</strong>: The shared library will be generated in the <code>target/release/</code> directory.</p>
 <ul>
-<li><code>*mut Point:</code> The function returns a raw pointer (<code>*mut Point</code>), which Java can manage using the <a href="https://openjdk.org/jeps/454">FFM API</a>.</li>
+<li>On Windows: <code>FileName.dll</code></li>
+<li>On Linux: <code>FileName.so</code></li>
+<li>On macOS: <code>FileName.dylib</code></li>
 </ul>
-<h2 id="step-2-compiling-rust-into-a-shared-library"><a class="header" href="#step-2-compiling-rust-into-a-shared-library">Step 2: Compiling Rust into a Shared Library</a></h2>
-<p>To compile the Rust code into a format Java can load, modify the <code>Cargo.toml</code> file:</p>
-<pre><code class="language-toml">[lib]
-crate-type = ["cdylib"]
+<h2 id="file-organization-example"><a class="header" href="#file-organization-example">File Organization Example</a></h2>
+<p>Here’s how your project should look after building the shared library:</p>
+<pre><code class="language-bash">rust_project/
+├── src/
+│   └── lib.rs          # Contains the Rust function
+├── Cargo.toml          # Rust project configuration
+└── target/
+    └── release/
+        └── librust_lib.dylib  # Shared library (for macOS)
 </code></pre>
-<p>Then, compile the Rust project into a <a href="so.html">shared library</a>:</p>
-<pre><code class="language-bash">cargo build --release
-</code></pre>
-<p>This command will generate a shared library file (e.g., <code>libmyrustlib.so</code> or <code>myrustlib.dll</code>) in the <code>target/release/</code> directory, which Java can dynamically load.</p>
 
                     </main>
 
