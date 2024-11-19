@@ -199,23 +199,25 @@ well, primitives. They are:
 primitives (<code>ADDRESS</code> is a bit special), <a href="size_and_alignment.html">aligned and unaligned</a>, which have
 direct mappings to C primitive types.<br />
 <br></p>
-<div class="table-wrapper"><table><thead><tr><th><strong>Java Type</strong></th><th><strong>C Type</strong></th><th><strong>Rust Type</strong></th></tr></thead><tbody>
-<tr><td>ValueLayout.ADDRESS</td><td>pointer</td><td>pointer or Option&lt;reference&gt;</td></tr>
-<tr><td>ValueLayout.ADDRESS_UNALIGNED</td><td>pointer with alignment 1</td><td>ditto with alignment 1</td></tr>
-<tr><td>ValueLayout.JAVA_BOOLEAN</td><td>char but must be 0 or 1</td><td>bool</td></tr>
-<tr><td>ValueLayout.JAVA_BYTE</td><td>char</td><td>i8</td></tr>
-<tr><td>ValueLayout.JAVA_CHAR</td><td>short storing a UTF-16 codepoint</td><td>u16 storing a UTF-16 codepoint</td></tr>
-<tr><td>ValueLayout.JAVA_CHAR_UNALIGNED</td><td>ditto with alignment 1</td><td>ditto with alignment 1</td></tr>
-<tr><td>ValueLayout.JAVA_DOUBLE</td><td>double</td><td>f64</td></tr>
-<tr><td>ValueLayout.JAVA_DOUBLE_UNALIGNED</td><td>f64 with alignment 1</td><td></td></tr>
-<tr><td>ValueLayout.JAVA_FLOAT</td><td>float</td><td>f32</td></tr>
-<tr><td>ValueLayout.JAVA_FLOAT_UNALIGNED</td><td>float with alignment 1</td><td>f32 with alignment 1</td></tr>
-<tr><td>ValueLayout.JAVA_INT</td><td>int</td><td>i32</td></tr>
-<tr><td>ValueLayout.JAVA_INT_UNALIGNED</td><td>int with alignment 1</td><td>i32 with alignment 1</td></tr>
-<tr><td>ValueLayout.JAVA_LONG</td><td>long</td><td>i64</td></tr>
-<tr><td>ValueLayout.JAVA_LONG_UNALIGNED</td><td>long with alignment 1</td><td>i64 with alignment 1</td></tr>
-<tr><td>ValueLayout.JAVA_SHORT</td><td>short</td><td>i16</td></tr>
-<tr><td>ValueLayout.JAVA_SHORT_UNALIGNED</td><td>short with alignment 1</td><td>i16 with alignment 1</td></tr>
+<h2 id="type-mappings-java-c-and-rust"><a class="header" href="#type-mappings-java-c-and-rust">Type Mappings: Java, C, and Rust</a></h2>
+<div class="table-wrapper"><table><thead><tr><th><strong>Java Type</strong></th><th><strong>C Type</strong></th><th><strong>Rust Type</strong></th><th><strong>Description</strong></th></tr></thead><tbody>
+<tr><td><code>ValueLayout.ADDRESS</code></td><td>Pointer</td><td><code>*mut</code>, <code>*const</code></td><td>Pointer to a memory location.</td></tr>
+<tr><td><code>ValueLayout.JAVA_INT</code></td><td><code>int</code></td><td><code>i32</code></td><td>32-bit signed integer.</td></tr>
+<tr><td><code>ValueLayout.JAVA_LONG</code></td><td><code>long</code></td><td><code>i64</code></td><td>64-bit signed integer.</td></tr>
+<tr><td><code>ValueLayout.JAVA_SHORT</code></td><td><code>short</code></td><td><code>i16</code></td><td>16-bit signed integer.</td></tr>
+<tr><td><code>ValueLayout.JAVA_BYTE</code></td><td><code>char</code></td><td><code>i8</code></td><td>8-bit signed integer.</td></tr>
+<tr><td><code>ValueLayout.JAVA_BOOLEAN</code></td><td><code>char (0 or 1)</code></td><td><code>bool</code></td><td>Boolean value (true or false).</td></tr>
+<tr><td><code>ValueLayout.JAVA_FLOAT</code></td><td><code>float</code></td><td><code>f32</code></td><td>32-bit floating-point number.</td></tr>
+<tr><td><code>ValueLayout.JAVA_DOUBLE</code></td><td><code>double</code></td><td><code>f64</code></td><td>64-bit floating-point number.</td></tr>
+<tr><td><code>ValueLayout.JAVA_CHAR</code></td><td><code>short (UTF-16)</code></td><td><code>u16</code></td><td>16-bit unsigned integer for UTF-16.</td></tr>
+</tbody></table>
+</div>
+<h2 id="unsigned-types"><a class="header" href="#unsigned-types">Unsigned Types</a></h2>
+<div class="table-wrapper"><table><thead><tr><th><strong>Java Type</strong></th><th><strong>C Type</strong></th><th><strong>Rust Type</strong></th><th><strong>Description</strong></th></tr></thead><tbody>
+<tr><td><code>ValueLayout.JAVA_INT</code></td><td><code>unsigned int</code></td><td><code>u8</code></td><td>8-bit unsigned integer.</td></tr>
+<tr><td><code>ValueLayout.JAVA_INT</code></td><td><code>unsigned int</code></td><td><code>u16</code></td><td>16-bit unsigned integer.</td></tr>
+<tr><td><code>ValueLayout.JAVA_LONG</code></td><td><code>unsigned long</code></td><td><code>u32</code></td><td>32-bit unsigned integer.</td></tr>
+<tr><td><code>ValueLayout.JAVA_LONG</code></td><td><code>unsigned long</code></td><td><code>u64</code></td><td>64-bit unsigned integer.</td></tr>
 </tbody></table>
 </div><br>  
 <p>So the <code>_UNALIGNED</code> versions are exactly the same as their counterparts
@@ -268,6 +270,22 @@ Rust doesn’t have <code>int</code>, <code>long</code>, etc., so we must use a 
 
         </div>
 
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
 
 
 

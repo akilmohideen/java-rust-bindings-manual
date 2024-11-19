@@ -24,24 +24,26 @@ primitives (`ADDRESS` is a bit special), [aligned and unaligned](size_and_alignm
 direct mappings to C primitive types.  
 <br>  
 
-| **Java Type** | **C Type** | **Rust Type** |
-|---------------|------------|---------------|
-| ValueLayout.ADDRESS | pointer | pointer or Option\<reference\> 
-| ValueLayout.ADDRESS_UNALIGNED | pointer with alignment 1 | ditto with alignment 1 
-| ValueLayout.JAVA_BOOLEAN | char but must be 0 or 1 | bool |
-| ValueLayout.JAVA_BYTE | char | i8 |
-| ValueLayout.JAVA_CHAR | short storing a UTF-16 codepoint | u16 storing a UTF-16 codepoint |
-| ValueLayout.JAVA_CHAR_UNALIGNED | ditto with alignment 1 | ditto with alignment 1 |
-| ValueLayout.JAVA_DOUBLE | double | f64 |
-| ValueLayout.JAVA_DOUBLE_UNALIGNED | f64 with alignment 1 | 
-| ValueLayout.JAVA_FLOAT | float | f32 |
-| ValueLayout.JAVA_FLOAT_UNALIGNED | float with alignment 1 | f32 with alignment 1 |
-| ValueLayout.JAVA_INT | int | i32 |
-| ValueLayout.JAVA_INT_UNALIGNED | int with alignment 1 | i32 with alignment 1 |
-| ValueLayout.JAVA_LONG | long | i64 |
-| ValueLayout.JAVA_LONG_UNALIGNED | long with alignment 1 | i64 with alignment 1 |
-| ValueLayout.JAVA_SHORT | short | i16 |
-| ValueLayout.JAVA_SHORT_UNALIGNED | short with alignment 1 | i16 with alignment 1 |
+## Type Mappings: Java, C, and Rust 
+| **Java Type** | **C Type** | **Rust Type** | **Description** |
+ |-----------------------|---------------------------|-------------------------|-------------------------------------| 
+| `ValueLayout.ADDRESS` | Pointer | `*mut`, `*const` | Pointer to a memory location. | 
+| `ValueLayout.JAVA_INT`| `int` | `i32` | 32-bit signed integer. |
+| `ValueLayout.JAVA_LONG`| `long` | `i64` | 64-bit signed integer. | 
+| `ValueLayout.JAVA_SHORT`| `short` | `i16` | 16-bit signed integer. |
+| `ValueLayout.JAVA_BYTE`| `char` | `i8` | 8-bit signed integer. | 
+| `ValueLayout.JAVA_BOOLEAN`| `char (0 or 1)` | `bool` | Boolean value (true or false). | 
+| `ValueLayout.JAVA_FLOAT`| `float` | `f32` | 32-bit floating-point number. | 
+| `ValueLayout.JAVA_DOUBLE`| `double` | `f64` | 64-bit floating-point number. | 
+| `ValueLayout.JAVA_CHAR`| `short (UTF-16)` | `u16` | 16-bit unsigned integer for UTF-16. | 
+
+## Unsigned Types
+| **Java Type** | **C Type** | **Rust Type** | **Description** |
+ |-----------------------|---------------------------|-------------------------|-------------------------------------|
+| `ValueLayout.JAVA_INT` | `unsigned int` | `u8` | 8-bit unsigned integer. | 
+| `ValueLayout.JAVA_INT` | `unsigned int` | `u16` | 16-bit unsigned integer. | 
+| `ValueLayout.JAVA_LONG` | `unsigned long` | `u32` | 32-bit unsigned integer. | 
+| `ValueLayout.JAVA_LONG`| `unsigned long` | `u64` | 64-bit unsigned integer. | 
 
 <br>  
 
