@@ -178,7 +178,7 @@
 <p>To make Rust functions callable from Java, you need to:</p>
 <ol>
 <li><strong>Prevent name mangling</strong>: Add <code>#[no_mangle]</code> to ensure Java can find the Rust function by its exact name.</li>
-<li><strong>Use the C ABI</strong>: Add <code>extern "C"</code> so the function adheres to the C Application Binary Interface (ABI), which Java can interact with.</li>
+<li><strong>Use the C ABI</strong>: Add <code>extern "C"</code> so the function adheres to the C Application Binary Interface (C ABI), which Java can interact with.</li>
 </ol>
 <h3 id="before-adding-no_mangle-and-extern-c"><a class="header" href="#before-adding-no_mangle-and-extern-c">Before Adding #[no_mangle] and extern "C"</a></h3>
 <p>Here’s a simple Rust function that adds two numbers. This version cannot yet be used by Java because the function name will be mangled and will not conform to the C ABI.</p>
@@ -215,7 +215,7 @@ crate-type = [“cdylib”]
 ├── Cargo.toml          # Rust project configuration
 └── target/
     └── release/
-        └── libmylib.dylib  # Shared library (for macOS)
+        └── librust_lib.dylib  # Shared library (for macOS)
 </code></pre>
 
                     </main>

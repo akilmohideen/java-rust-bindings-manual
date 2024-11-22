@@ -185,7 +185,7 @@ struct Point {
     y: i32,
 }
 <span class="boring">}</span></code></pre></pre>
-<p>Explanation: The <code>#[repr(C)]</code> attribute ensures that the struct is laid out in memory according to the C ABI, which is compatible with Java's FFM API.</p>
+<p><strong>Explanation</strong>: The <code>#[repr(C)]</code> attribute ensures that the struct is laid out in memory according to the <strong>C ABI</strong>, which is compatible with Java's <a href="https://openjdk.org/jeps/454"><strong>FFM API</strong></a>.</p>
 <h2 id="java-side"><a class="header" href="#java-side">Java Side</a></h2>
 <p>To use this struct in Java, we need to:</p>
 <ul>

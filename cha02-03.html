@@ -189,26 +189,26 @@ This block initializes the native linker and loads the Rust library.</p>
 </ol>
 <pre><code class="language-java">static{
     Linker linker = Linker.nativeLinker(); // Initializes the native linker
-    ...
+    // ...
 }  
 </code></pre>
 <p>The linker is used to bind Java code to native functions from the Rust library.</p>
 <ol start="2">
 <li><strong>Load the Rust Shared Library</strong></li>
 </ol>
-<pre><code class="language-java">    SymbolLookup lib = SymbolLookup.libraryLookup("/* path/to/your/FileName.dylib */", Arena.global()); // Loads the Rust library
+<pre><code class="language-java">SymbolLookup lib = SymbolLookup.libraryLookup("/* path/to/your/FileName.dylib */", Arena.global()); // Loads the Rust library
 </code></pre>
 <p>Replace "<code>/* path/to/your/FileName.dylib */</code>" with the actual path to the shared library (e.g., <code>librust_lib.dylib</code> on macOS).
 <a href="arenas.html"><code>The Arena.global()</code></a> ensures global memory scope for linked symbols.</p>
 <ol start="3">
 <li><strong>Link the Functions</strong></li>
 </ol>
-<pre><code class="language-java">    yourMethodName = linker.downcallHandle(
+<pre><code class="language-java"> yourMethodName = linker.downcallHandle(
     lib.find("/* function_name */").orElseThrow(), // Replace with the Rust function name
     FunctionDescriptor.of(
-        ValueLayout.JAVA_TYPE,                     // Match Java's return type to Rust's return type
-        ValueLayout.JAVA_TYPE,                     // Match Java's first parameter type to Rust's first parameter type
-        ValueLayout.JAVA_TYPE                      // Match Java's second parameter type to Rust's second parameter type
+        ValueLayout.JAVA_INT,                     // Match Java's return type to Rust's return type
+        ValueLayout.JAVA_INT,                     // Match Java's first parameter type to Rust's first parameter type
+        ValueLayout.JAVA_INT                      // Match Java's second parameter type to Rust's second parameter type
     )
 );
 </code></pre>

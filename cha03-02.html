@@ -176,7 +176,8 @@
                         <h1 id="handling-ownership-and-borrowing"><a class="header" href="#handling-ownership-and-borrowing">Handling Ownership and Borrowing</a></h1>
 <h2 id="identifying-ownership-and-borrowing-in-rust"><a class="header" href="#identifying-ownership-and-borrowing-in-rust">Identifying Ownership and Borrowing in Rust</a></h2>
 <p>Rust enforces strict <a href="ownership.html">ownership</a> rules. When a function in Rust takes ownership of a value (e.g., <code>Box</code>, <code>Vec</code>), it means the caller no longer owns that value and cannot use it again unless ownership is returned. <a href="borrowing_and_aliasing.html">Borrowing</a> (<code>&amp;T</code> or <code>&amp;mut T</code>) allows temporary access to a value without transferring ownership.</p>
-<h3 id="example"><a class="header" href="#example">Example:</a></h3>
+<h3 id="pre-modified-rust-function"><a class="header" href="#pre-modified-rust-function">Pre-Modified Rust Function:</a></h3>
+<p>Here’s an example of two functions that demonstrate ownership and borrowing in Rust <strong>before modification</strong> for interoperability with Java:</p>
 <pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>fn take_ownership(v: Vec&lt;i32&gt;) -&gt; Vec&lt;i32&gt; {
@@ -189,11 +190,36 @@ fn borrow(v: &amp;Vec&lt;i32&gt;) -&gt; i32 {
     v[0]
 }
 <span class="boring">}</span></code></pre></pre>
+<h4 id="explanation"><a class="header" href="#explanation">Explanation:</a></h4>
+<p><code>take_ownership</code>:</p>
+<ul>
+<li>Transfers ownership of the <code>Vec</code> to the function.</li>
+<li>The original owner can no longer use <code>v</code> unless ownership is explicitly returned.
+<code>borrow</code>:</li>
+<li>Borrows the <code>Vec</code> temporarily to access its first element without transferring ownership.</li>
+<li>The caller retains ownership.</li>
+</ul>
+<h3 id="modified-rust-function"><a class="header" href="#modified-rust-function">Modified Rust Function</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[no_mangle]
+pub extern "C" fn take_ownership(v: *mut Vec&lt;i32&gt;) -&gt; *mut Vec&lt;i32&gt; {
+    // Transfers ownership of the vector
+    v
+}
+
+#[no_mangle]
+pub extern "C" fn borrow(v: *mut Vec&lt;i32&gt;) -&gt; i32 {
+    unsafe { (*v)[0] } // Borrowing a raw pointer
+}
+<span class="boring">}</span></code></pre></pre>
+<h3 id="explanation-1"><a class="header" href="#explanation-1">Explanation:</a></h3>
+<p>Check <a href="cha02-02.html">Chapter 2.2(Setting Up Rust)</a></p>
 <h2 id="handling-ownership-in-java"><a class="header" href="#handling-ownership-in-java">Handling Ownership in Java</a></h2>
-<p>When Rust functions take ownership of values, Java needs to manage when to free the underlying memory. If Java creates the object (e.g., calling <code>Box</code> in Rust), it must free the object explicitly. Java must also ensure the memory is valid during the borrowed reference’s lifetime.</p>
+<p>When Rust functions take ownership of values or borrow them, Java developers must manage memory explicitly to prevent leaks or invalid references.</p>
 <h3 id="what-you-need-to-do"><a class="header" href="#what-you-need-to-do">What You Need to Do:</a></h3>
 <ul>
-<li><strong>For functions that take ownership</strong>: You need to call the appropriate Rust cleanup function (<code>like</code> drop or <code>free</code>) using <strong><a href="method_handle.html"><code>MethodHandle</code></a></strong> in Java.</li>
+<li><strong>For functions that take ownership</strong>: You need to call the appropriate Rust cleanup function (<code>like</code> drop or <code>free</code>) using <strong><a href="method_handle.html"><code>MethodHandle</code></a></strong> in Java. is released once the object is no longer needed.</li>
 <li><strong>For borrowed references</strong>: Manage memory using <strong><a href="arenas.html"><code>Arena</code></a></strong> to ensure that memory remains valid for the borrowed duration.</li>
 </ul>
 <h3 id="java-example-handling-ownership"><a class="header" href="#java-example-handling-ownership">Java Example (Handling Ownership):</a></h3>
@@ -206,8 +232,8 @@ RustBindings.takeOwnership.invokeExact(rustBox);
 // Manually free the Box when done 
 RustBindings.freeBox.invokeExact(rustBox); // Ensures no memory leaks
 </code></pre>
-<h3 id="explanation"><a class="header" href="#explanation">Explanation:</a></h3>
-<p><a href="memory_segment.html">MemorySegment</a> represents the Rust-allocated memory in Java. After transferring ownership to Rust, Java explicitly calls <code>freeBox</code> to release the memory.</p>
+<h4 id="explanation-2"><a class="header" href="#explanation-2">Explanation:</a></h4>
+<p><a href="memory_segment.html">MemorySegment</a> represents the Rust-allocated memory in Java. Java interacts with this using the Foreign Function &amp; Memory API. When <code>takeOwnership</code> is called, the Rust function takes ownership of <code>rustBox</code>. Java then explicitly calls <code>freeBox</code> to release the memory allocated in Rust and prevent leaks.</p>
 
                     </main>
 
