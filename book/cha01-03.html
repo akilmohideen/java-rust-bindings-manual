@@ -174,8 +174,7 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="how-java-and-rust-work-together"><a class="header" href="#how-java-and-rust-work-together">How Java and Rust Work Together</a></h1>
-<p>How Java and Rust Work Together
-Rust is a system-level language that provides fine-grained control over memory management, making it a popular choice for performance-critical applications. Java, on the other hand, excels in providing portability and high-level abstractions. By using the <a href="https://openjdk.org/jeps/454">FFM API</a> in Java 22, developers can leverage Rust’s performance and memory safety in Java applications.</p>
+<p>Rust is a system-level language that provides fine-grained control over memory management, making it a popular choice for performance-critical applications. Java, on the other hand, excels in providing portability and high-level abstractions. By using the <a href="https://openjdk.org/jeps/454">FFM API</a> in Java 22, developers can leverage Rust’s performance and memory safety in Java applications.</p>
 <p>It provides access to classes such as <code>SymbolLookup</code>, <code>FunctionDescriptor</code>, <code>Linker</code>, <code>MethodHandle</code>, <a href="arenas.html"><code>Arena</code></a>, and <code>MemorySegment</code>, which enable Java to call foreign functions and manage memory in more effective ways. On Rust's end, functions exposed to Java must adhere to the <strong>C ABI</strong>, ensuring compatibility between the two languages. The manual will explore how to allocate, manage, and release memory safely between Java and Rust, ensuring optimal performance and avoiding memory leaks or undefined behavior.</p>
 
                     </main>

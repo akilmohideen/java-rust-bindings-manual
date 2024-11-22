@@ -176,15 +176,16 @@
                         <h1 id="handling-thread-safety-in-rust"><a class="header" href="#handling-thread-safety-in-rust">Handling Thread Safety in Rust</a></h1>
 <h2 id="identifying-thread-safety-in-rust"><a class="header" href="#identifying-thread-safety-in-rust">Identifying Thread Safety in Rust</a></h2>
 <p>In Rust, <strong>thread safety</strong> is ensured using the <a href="send_and_sync.html">Send and Sync</a> traits. If a Rust function operates across multiple threads, the types used in the function must implement <code>Send</code> or <code>Sync</code>. For example, if a Rust function uses a <strong>Mutex</strong> or <strong>Arc</strong> to manage shared data, it is thread-safe.</p>
-<h3 id="example"><a class="header" href="#example">Example:</a></h3>
+<h3 id="modified-rust-function"><a class="header" href="#modified-rust-function">Modified Rust Function:</a></h3>
 <pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>use std::sync::{Arc, Mutex};
-
-pub fn create_shared_data() -&gt; Arc&lt;Mutex&lt;i32&gt;&gt; {
-    Arc::new(Mutex::new(42))
+</span>#[no_mangle]
+pub extern "C" fn create_shared_data() -&gt; *mut Arc&lt;Mutex&lt;i32&gt;&gt; {
+    let shared_data = Arc::new(Mutex::new(42));
+    Box::into_raw(Box::new(shared_data))
 }
 <span class="boring">}</span></code></pre></pre>
+<p><em>Read through chapter <a href="cha02-02.html">Chapter 2.2(Setting Up Rust)</a> if you are confused about the modification</em></p>
 <p>The function returns a thread-safe <code>Arc&lt;Mutex&lt;i32&gt;&gt;</code>, which ensures that multiple threads can safely access and modify the shared data.</p>
 <h2 id="ensuring-thread-safety-in-java"><a class="header" href="#ensuring-thread-safety-in-java">Ensuring Thread Safety in Java</a></h2>
 <p>When dealing with thread safety across languages, Java must ensure that memory is safely shared between threads. Java’s <a href="https://openjdk.org/jeps/454">FFM API</a> provides <a href="arenas.html"><strong>Shared Arenas</strong></a>, which allow memory to be safely accessed by multiple threads.</p>

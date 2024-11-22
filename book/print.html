@@ -183,13 +183,12 @@
 <div style="break-before: page; page-break-before: always;"></div><h1 id="purpose-of-the-manual"><a class="header" href="#purpose-of-the-manual">Purpose of the Manual</a></h1>
 <p>The purpose of this manual is to provide a comprehensive guide for creating Java bindings to Rust libraries using <strong>Java 22</strong> and <strong>Rust 1.81.0</strong>. It will cover the essential steps and concepts required to allow Java applications to call Rust functions, making use of the <a href="https://openjdk.org/jeps/454">Foreign Function and Memory API</a>. By the end of this manual, developers will be able to seamlessly integrate Rust’s high-performance, memory-safe capabilities into their Java applications, enabling cross-language functionality.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="why-java-22"><a class="header" href="#why-java-22">Why Java 22?</a></h1>
-<p>Java 22 introduces the <a href="https://openjdk.org/jeps/454">Foreign Function and Memory API</a> (FFM API), a modern alternative to the legacy <strong>Java Native Interface (JNI)</strong>. JNI was traditionally used to interact with C-like functions and data types in external libraries. However, JNI is cumbersome, error-prone, and introduces significant overhead due to repeated native function calls and lack of <strong>Just-In-Time (JIT)</strong> optimizations. Java objects needed to be passed through JNI, requiring additional work on the native side to identify object types and data locations, making the entire process tedious and slow.
-With the FFM API, Java now pushes much of the integration work to the Java side, eliminating the need for custom C headers and providing more visibility for the JIT compiler.</p>
+<p>Java 22 introduces the <a href="https://openjdk.org/jeps/454">Foreign Function and Memory API</a> (<strong>FFM API</strong>), a modern alternative to the legacy <strong>Java Native Interface (JNI)</strong>. JNI was traditionally used to interact with C-like functions and data types in external libraries. However, JNI is cumbersome, error-prone, and introduces significant overhead due to repeated native function calls and lack of <strong>Just-In-Time (JIT)</strong> optimizations. Java objects needed to be passed through JNI, requiring additional work on the native side to identify object types and data locations, making the entire process tedious and slow.
+With the <a href="https://openjdk.org/jeps/454">FFM API</a>, Java now pushes much of the integration work to the Java side, eliminating the need for custom C headers and providing more visibility for the JIT compiler.</p>
 <p>This change leads to <strong>Better Performance</strong>, as the JIT compiler can now optimize calls to native libraries more effectively. It also leads to <strong>Simplified Integration</strong> because there are fewer requirements on native function signatures. This reduces the overhead of native-to-Java translation. Additionally, the API provides <strong>Enhanced Flexibility</strong>, as it supports working with various languages like Rust while maintaining full control over how memory and function calls are handled.</p>
 <p>Java 22 is the first version to stabilize this API, making it the ideal choice for this manual. It enables efficient, direct interaction with Rust libraries without the historical drawbacks of JNI.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="how-java-and-rust-work-together"><a class="header" href="#how-java-and-rust-work-together">How Java and Rust Work Together</a></h1>
-<p>How Java and Rust Work Together
-Rust is a system-level language that provides fine-grained control over memory management, making it a popular choice for performance-critical applications. Java, on the other hand, excels in providing portability and high-level abstractions. By using the <a href="https://openjdk.org/jeps/454">FFM API</a> in Java 22, developers can leverage Rust’s performance and memory safety in Java applications.</p>
+<p>Rust is a system-level language that provides fine-grained control over memory management, making it a popular choice for performance-critical applications. Java, on the other hand, excels in providing portability and high-level abstractions. By using the <a href="https://openjdk.org/jeps/454">FFM API</a> in Java 22, developers can leverage Rust’s performance and memory safety in Java applications.</p>
 <p>It provides access to classes such as <code>SymbolLookup</code>, <code>FunctionDescriptor</code>, <code>Linker</code>, <code>MethodHandle</code>, <a href="arenas.html"><code>Arena</code></a>, and <code>MemorySegment</code>, which enable Java to call foreign functions and manage memory in more effective ways. On Rust's end, functions exposed to Java must adhere to the <strong>C ABI</strong>, ensuring compatibility between the two languages. The manual will explore how to allocate, manage, and release memory safely between Java and Rust, ensuring optimal performance and avoiding memory leaks or undefined behavior.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="what-this-manual-hopes-to-accomplish"><a class="header" href="#what-this-manual-hopes-to-accomplish">What This Manual Hopes to Accomplish</a></h1>
 <p>By the end, this manual will:</p>
@@ -207,7 +206,7 @@ Rust is a system-level language that provides fine-grained control over memory m
 <p>This process requires separate files for Rust code and Java bindings, each with specific configurations and naming conventions. The file names and formats may vary depending on your operating system and Rust version.</p>
 <ul>
 <li>
-<p><strong>Rust File</strong>: Contains the functions to be exposed to Java. This file is typically named lib.rs and located in the src/ directory of a Rust project.</p>
+<p><strong>Rust File</strong>: Contains the functions to be exposed to Java. This file is typically named <code>lib.rs</code> and located in the <code>src/</code> directory of a Rust project.</p>
 </li>
 <li>
 <p><strong>Shared Library File</strong>: This is the compiled output of the Rust code. The file name and extension depend on your operating system.</p>
@@ -226,7 +225,7 @@ Rust is a system-level language that provides fine-grained control over memory m
 <p>To make Rust functions callable from Java, you need to:</p>
 <ol>
 <li><strong>Prevent name mangling</strong>: Add <code>#[no_mangle]</code> to ensure Java can find the Rust function by its exact name.</li>
-<li><strong>Use the C ABI</strong>: Add <code>extern "C"</code> so the function adheres to the C Application Binary Interface (ABI), which Java can interact with.</li>
+<li><strong>Use the C ABI</strong>: Add <code>extern "C"</code> so the function adheres to the C Application Binary Interface (C ABI), which Java can interact with.</li>
 </ol>
 <h3 id="before-adding-no_mangle-and-extern-c"><a class="header" href="#before-adding-no_mangle-and-extern-c">Before Adding #[no_mangle] and extern "C"</a></h3>
 <p>Here’s a simple Rust function that adds two numbers. This version cannot yet be used by Java because the function name will be mangled and will not conform to the C ABI.</p>
@@ -281,7 +280,7 @@ This block initializes the native linker and loads the Rust library.</p>
 </ol>
 <pre><code class="language-java">static{
     Linker linker = Linker.nativeLinker(); // Initializes the native linker
-    ...
+    // ...
 }  
 </code></pre>
 <p>The linker is used to bind Java code to native functions from the Rust library.</p>
@@ -349,11 +348,12 @@ public class RustBindings {
 <p><code>.invokeExact()</code> is a powerful and strict method for calling functions using a <code>MethodHandle</code>. It ensures precise type matching, which is especially important for interoperability with external libraries (like Rust) where argument types are fixed. Always ensure that the types match exactly to avoid runtime exceptions.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="mapping-rust-features-to-java"><a class="header" href="#mapping-rust-features-to-java">Mapping Rust Features to Java</a></h1>
 <p>This section will cover how to properly account for features that are important to Rust. For each Rust concept, the process to Identify a feature and handle it properly in Java will be shown.</p>
-<p>By the end of this section, the steps to analyze a Rust function, and determine what needs to be written in Java to bind it correctly, will be clear. This includes handling <a href="lifetimes.html">lifetimes</a>, <a href="ownership.html">ownership</a>, <a href="memory_layout.html">memory layouts</a>, thread safety, and more.</p>
+<p>By the end of this section, the steps to analyze a Rust function, and determine what needs to be written in Java to bind it correctly, will be clear. This includes handling <a href="ownership.html">ownership</a>, <a href="memory_layout.html">memory layouts</a>, and thread safety</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="handling-ownership-and-borrowing"><a class="header" href="#handling-ownership-and-borrowing">Handling Ownership and Borrowing</a></h1>
 <h2 id="identifying-ownership-and-borrowing-in-rust"><a class="header" href="#identifying-ownership-and-borrowing-in-rust">Identifying Ownership and Borrowing in Rust</a></h2>
 <p>Rust enforces strict <a href="ownership.html">ownership</a> rules. When a function in Rust takes ownership of a value (e.g., <code>Box</code>, <code>Vec</code>), it means the caller no longer owns that value and cannot use it again unless ownership is returned. <a href="borrowing_and_aliasing.html">Borrowing</a> (<code>&amp;T</code> or <code>&amp;mut T</code>) allows temporary access to a value without transferring ownership.</p>
-<h3 id="example"><a class="header" href="#example">Example:</a></h3>
+<h3 id="pre-modified-rust-function"><a class="header" href="#pre-modified-rust-function">Pre-Modified Rust Function:</a></h3>
+<p>Here’s an example of two functions that demonstrate ownership and borrowing in Rust <strong>before modification</strong> for interoperability with Java:</p>
 <pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>fn take_ownership(v: Vec&lt;i32&gt;) -&gt; Vec&lt;i32&gt; {
@@ -366,11 +366,36 @@ fn borrow(v: &amp;Vec&lt;i32&gt;) -&gt; i32 {
     v[0]
 }
 <span class="boring">}</span></code></pre></pre>
+<h4 id="explanation"><a class="header" href="#explanation">Explanation:</a></h4>
+<p><code>take_ownership</code>:</p>
+<ul>
+<li>Transfers ownership of the <code>Vec</code> to the function.</li>
+<li>The original owner can no longer use <code>v</code> unless ownership is explicitly returned.
+<code>borrow</code>:</li>
+<li>Borrows the <code>Vec</code> temporarily to access its first element without transferring ownership.</li>
+<li>The caller retains ownership.</li>
+</ul>
+<h3 id="modified-rust-function"><a class="header" href="#modified-rust-function">Modified Rust Function</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[no_mangle]
+pub extern "C" fn take_ownership(v: *mut Vec&lt;i32&gt;) -&gt; *mut Vec&lt;i32&gt; {
+    // Transfers ownership of the vector
+    v
+}
+
+#[no_mangle]
+pub extern "C" fn borrow(v: *mut Vec&lt;i32&gt;) -&gt; i32 {
+    unsafe { (*v)[0] } // Borrowing a raw pointer
+}
+<span class="boring">}</span></code></pre></pre>
+<h3 id="explanation-1"><a class="header" href="#explanation-1">Explanation:</a></h3>
+<p>Check <a href="cha02-02.html">Chapter 2.2(Setting Up Rust)</a></p>
 <h2 id="handling-ownership-in-java"><a class="header" href="#handling-ownership-in-java">Handling Ownership in Java</a></h2>
-<p>When Rust functions take ownership of values, Java needs to manage when to free the underlying memory. If Java creates the object (e.g., calling <code>Box</code> in Rust), it must free the object explicitly. Java must also ensure the memory is valid during the borrowed reference’s lifetime.</p>
+<p>When Rust functions take ownership of values or borrow them, Java developers must manage memory explicitly to prevent leaks or invalid references.</p>
 <h3 id="what-you-need-to-do"><a class="header" href="#what-you-need-to-do">What You Need to Do:</a></h3>
 <ul>
-<li><strong>For functions that take ownership</strong>: You need to call the appropriate Rust cleanup function (<code>like</code> drop or <code>free</code>) using <strong><a href="method_handle.html"><code>MethodHandle</code></a></strong> in Java.</li>
+<li><strong>For functions that take ownership</strong>: You need to call the appropriate Rust cleanup function (<code>like</code> drop or <code>free</code>) using <strong><a href="method_handle.html"><code>MethodHandle</code></a></strong> in Java. is released once the object is no longer needed.</li>
 <li><strong>For borrowed references</strong>: Manage memory using <strong><a href="arenas.html"><code>Arena</code></a></strong> to ensure that memory remains valid for the borrowed duration.</li>
 </ul>
 <h3 id="java-example-handling-ownership"><a class="header" href="#java-example-handling-ownership">Java Example (Handling Ownership):</a></h3>
@@ -383,15 +408,15 @@ RustBindings.takeOwnership.invokeExact(rustBox);
 // Manually free the Box when done 
 RustBindings.freeBox.invokeExact(rustBox); // Ensures no memory leaks
 </code></pre>
-<h3 id="explanation"><a class="header" href="#explanation">Explanation:</a></h3>
-<p><a href="memory_segment.html">MemorySegment</a> represents the Rust-allocated memory in Java. After transferring ownership to Rust, Java explicitly calls <code>freeBox</code> to release the memory.</p>
+<h4 id="explanation-2"><a class="header" href="#explanation-2">Explanation:</a></h4>
+<p><a href="memory_segment.html">MemorySegment</a> represents the Rust-allocated memory in Java. Java interacts with this using the Foreign Function &amp; Memory API. When <code>takeOwnership</code> is called, the Rust function takes ownership of <code>rustBox</code>. Java then explicitly calls <code>freeBox</code> to release the memory allocated in Rust and prevent leaks.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="memory-layouts-and-structs"><a class="header" href="#memory-layouts-and-structs">Memory Layouts and Structs</a></h1>
 <h2 id="identifying-structs-and-memory-layouts-in-rust"><a class="header" href="#identifying-structs-and-memory-layouts-in-rust">Identifying Structs and Memory Layouts in Rust</a></h2>
 <p>When Rust returns complex data types like <strong>structs</strong> or <strong>arrays</strong>, Java needs to correctly interpret their <a href="memory_layout.html">memory layout</a>. Rust’s struct fields are aligned in memory based on their type sizes, so Java must use <strong>StructLayout</strong> and <a href="value_layout.html">ValueLayout</a> to match the Rust memory layout exactly.</p>
-<h3 id="example-1"><a class="header" href="#example-1">Example:</a></h3>
+<h3 id="example"><a class="header" href="#example">Example:</a></h3>
 <pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>#[repr(C)]
+</span>#[repr(C)] // Add this!
 struct Point {
     x: i32,
     y: i32,
@@ -422,7 +447,7 @@ VarHandle yHandle = pointLayout.varHandle(PathElement.groupElement("y"));
 xHandle.set(pointSegment, 0, 10);  // Set x to 10
 yHandle.set(pointSegment, 0, 20);  // Set y to 20
 </code></pre>
-<h2 id="explanation-1"><a class="header" href="#explanation-1">Explanation:</a></h2>
+<h2 id="explanation-3"><a class="header" href="#explanation-3">Explanation:</a></h2>
 <ul>
 <li><a href="struct_layout.html"><strong>StructLayout</strong></a>: Defines the layout of the Rust <code>Point</code> struct, where each field is aligned according to its type (in this case, both fields are <code>i32</code>, so each is 4 bytes).</li>
 <li><a href="variable_handle.html"><strong>VarHandle</strong></a>: Used to access and set individual fields (<code>x</code> and <code>y</code>) in the memory segment allocated for the struct.</li>
@@ -431,15 +456,16 @@ yHandle.set(pointSegment, 0, 20);  // Set y to 20
 <div style="break-before: page; page-break-before: always;"></div><h1 id="handling-thread-safety-in-rust"><a class="header" href="#handling-thread-safety-in-rust">Handling Thread Safety in Rust</a></h1>
 <h2 id="identifying-thread-safety-in-rust"><a class="header" href="#identifying-thread-safety-in-rust">Identifying Thread Safety in Rust</a></h2>
 <p>In Rust, <strong>thread safety</strong> is ensured using the <a href="send_and_sync.html">Send and Sync</a> traits. If a Rust function operates across multiple threads, the types used in the function must implement <code>Send</code> or <code>Sync</code>. For example, if a Rust function uses a <strong>Mutex</strong> or <strong>Arc</strong> to manage shared data, it is thread-safe.</p>
-<h3 id="example-2"><a class="header" href="#example-2">Example:</a></h3>
+<h3 id="modified-rust-function-1"><a class="header" href="#modified-rust-function-1">Modified Rust Function:</a></h3>
 <pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>use std::sync::{Arc, Mutex};
-
-pub fn create_shared_data() -&gt; Arc&lt;Mutex&lt;i32&gt;&gt; {
-    Arc::new(Mutex::new(42))
+</span>#[no_mangle]
+pub extern "C" fn create_shared_data() -&gt; *mut Arc&lt;Mutex&lt;i32&gt;&gt; {
+    let shared_data = Arc::new(Mutex::new(42));
+    Box::into_raw(Box::new(shared_data))
 }
 <span class="boring">}</span></code></pre></pre>
+<p><em>Read through chapter <a href="cha02-02.html">Chapter 2.2(Setting Up Rust)</a> if you are confused about the modification</em></p>
 <p>The function returns a thread-safe <code>Arc&lt;Mutex&lt;i32&gt;&gt;</code>, which ensures that multiple threads can safely access and modify the shared data.</p>
 <h2 id="ensuring-thread-safety-in-java"><a class="header" href="#ensuring-thread-safety-in-java">Ensuring Thread Safety in Java</a></h2>
 <p>When dealing with thread safety across languages, Java must ensure that memory is safely shared between threads. Java’s <a href="https://openjdk.org/jeps/454">FFM API</a> provides <a href="arenas.html"><strong>Shared Arenas</strong></a>, which allow memory to be safely accessed by multiple threads.</p>
@@ -461,7 +487,7 @@ synchronized (sharedSegment) {
     // Safe access to shared memory here
 }
 </code></pre>
-<h3 id="explanation-2"><a class="header" href="#explanation-2">Explanation:</a></h3>
+<h3 id="explanation-4"><a class="header" href="#explanation-4">Explanation:</a></h3>
 <ul>
 <li><strong>Shared Arena</strong>: Ensures that memory is safely shared across threads in Java when interacting with Rust’s thread-safe types like <code>Arc</code> and <code>Mutex</code>.</li>
 <li><strong>Synchronized Block</strong>: Ensures that only one thread accesses the shared memory at a time, mimicking Rust’s ownership rules for shared data.</li>
@@ -480,7 +506,7 @@ struct Point {
     y: i32,
 }
 <span class="boring">}</span></code></pre></pre>
-<p>Explanation: The <code>#[repr(C)]</code> attribute ensures that the struct is laid out in memory according to the C ABI, which is compatible with Java's FFM API.</p>
+<p><strong>Explanation</strong>: The <code>#[repr(C)]</code> attribute ensures that the struct is laid out in memory according to the <strong>C ABI</strong>, which is compatible with Java's <a href="https://openjdk.org/jeps/454"><strong>FFM API</strong></a>.</p>
 <h2 id="java-side"><a class="header" href="#java-side">Java Side</a></h2>
 <p>To use this struct in Java, we need to:</p>
 <ul>
@@ -496,7 +522,7 @@ struct Point {
 VarHandle xHandle = pointLayout.varHandle(PathElement.groupElement("x"));
 VarHandle yHandle = pointLayout.varHandle(PathElement.groupElement("y"));
 </code></pre>
-<h3 id="explanation-3"><a class="header" href="#explanation-3">Explanation:</a></h3>
+<h3 id="explanation-5"><a class="header" href="#explanation-5">Explanation:</a></h3>
 <ul>
 <li><code>ValueLayout.JAVA_INT</code>: This matches Rust’s i32 type.</li>
 <li><code>withName("x")</code> and <code>withName("y")</code>: Naming each field lets us retrieve a VarHandle to read and write to specific fields of the MemorySegment that represents the Rust struct.</li>
@@ -513,7 +539,7 @@ yHandle.set(pointSegment, 0, 20);  // Set y = 20
 int x = (int) xHandle.get(pointSegment);  // Get x value
 int y = (int) yHandle.get(pointSegment);  // Get y value
 </code></pre>
-<h3 id="explanation-4"><a class="header" href="#explanation-4">Explanation:</a></h3>
+<h3 id="explanation-6"><a class="header" href="#explanation-6">Explanation:</a></h3>
 <p><strong>Arena Allocation</strong>: Using an arena (e.g., <code>Arena.ofConfined()</code>) ensures the struct’s memory is safely managed.</p>
 <p><strong>Set and Get Values</strong>: <code>VarHandle</code> operations allow us to interact with Rust struct fields directly, facilitating cross-language data manipulation.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="handling-rust-arrays-in-java"><a class="header" href="#handling-rust-arrays-in-java">Handling Rust Arrays in Java</a></h1>
@@ -770,7 +796,7 @@ if (tag == 0) {  // Ok variant
 <li>Verify <code>FunctionDescriptor</code>: Ensure that the <code>FunctionDescriptor</code> matches the Rust function’s expected argument and return types exactly.</li>
 <li>Check Argument Casts: Explicitly cast arguments to their expected types, and cast return values as needed.</li>
 </ol>
-<h2 id="example-3"><a class="header" href="#example-3">Example:</a></h2>
+<h2 id="example-1"><a class="header" href="#example-1">Example:</a></h2>
 <pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// Rust function signature: pub extern "C" fn add(x: i32, y: i32) -&gt; i32
@@ -791,7 +817,7 @@ int result = (int) addHandle.invokeExact(5, 3);  // Cast to int as expected
 <li><strong>Verify <code>MemoryLayout</code> Alignment</strong>: Ensure <code>MemoryLayout</code> precisely matches Rust’s struct or array layout, particularly if <code>#[repr(C)]</code> is used.</li>
 <li><strong>Use Arenas Appropriately</strong>: Manage memory with confined or auto arenas to ensure data remains valid only as long as needed.</li>
 </ol>
-<h2 id="example-4"><a class="header" href="#example-4">Example</a></h2>
+<h2 id="example-2"><a class="header" href="#example-2">Example</a></h2>
 <p><strong>In Rust</strong>:</p>
 <pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
@@ -829,7 +855,7 @@ dataSegment = (MemorySegment) createData.invokeExact();
 <li><code>Specify Library Path and Name Correctly</code>: Ensure that the shared library file is available in the system path or specified explicitly.</li>
 <li><code>Check System Compatibility</code>: Ensure that the library file matches the OS format (e.g., .dll on Windows).</li>
 </ol>
-<h2 id="example-5"><a class="header" href="#example-5">Example:</a></h2>
+<h2 id="example-3"><a class="header" href="#example-3">Example:</a></h2>
 <pre><code class="language-java">// Ensure correct file name for your OS
 SymbolLookup lib = SymbolLookup.libraryLookup("libmylibrary.so", Arena.global());
 </code></pre>
